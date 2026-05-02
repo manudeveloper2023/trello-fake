@@ -9,6 +9,7 @@ import { jwtConfig } from './config/jwt.config';
 import { AuthModule } from './auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guards/jwt.guard';
+import { UserModule } from './users/user.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { JwtGuard } from './auth/guards/jwt.guard';
     }),
     TaskModule,
     PrismaModule,
+    UserModule,
     JwtModule.registerAsync({
       global: true,
       imports: [ConfigModule],
