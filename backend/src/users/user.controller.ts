@@ -1,13 +1,10 @@
-import { Controller, Get } from '@nestjs/common';
-import type { Request } from 'express';
+import { Controller, Get, Request } from '@nestjs/common';
 
 @Controller('users')
 export class UserController {
   @Get('profile')
-  getProfile(request: Request) {
+  getProfile(@Request() request: Request) {
     const user = request['user'];
-
-    console.log('User profile:', user);
     return { message: 'This is the user profile endpoint', user };
   }
 }
