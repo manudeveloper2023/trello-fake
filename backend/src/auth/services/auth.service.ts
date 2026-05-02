@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
-import { LoginRegisterDTO, UserRegisterDTO } from './dtos/user';
+import { LoginRegisterDTO, UserRegisterDTO } from '../dtos/user';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
-import { UserService } from 'src/users/user.service';
+import { UserService } from 'src/identity/users/user.service';
 
 @Injectable({})
 export class AuthService {
@@ -56,7 +56,6 @@ export class AuthService {
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid email or password.');
     }
-
     const payload = { sub: authUser.id, email: authUser.email };
     const token = this.jwtService.sign(payload);
 
