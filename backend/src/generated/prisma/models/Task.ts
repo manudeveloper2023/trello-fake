@@ -463,14 +463,6 @@ export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
 
-export type IntFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type TaskCreateNestedManyWithoutTagsInput = {
   create?: Prisma.XOR<Prisma.TaskCreateWithoutTagsInput, Prisma.TaskUncheckedCreateWithoutTagsInput> | Prisma.TaskCreateWithoutTagsInput[] | Prisma.TaskUncheckedCreateWithoutTagsInput[]
   connectOrCreate?: Prisma.TaskCreateOrConnectWithoutTagsInput | Prisma.TaskCreateOrConnectWithoutTagsInput[]

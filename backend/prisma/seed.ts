@@ -3,6 +3,7 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from 'src/generated/prisma/client';
 import bcrypt from 'bcrypt';
+import { Role } from 'src/identity/roles/models/role';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -21,6 +22,12 @@ async function main() {
       email: 'manu@gmail.com',
       username: 'manu',
       password: passwordHash,
+      roles: {
+        connectOrCreate: {
+          where: { name: Role.User },
+          create: { name: Role.User },
+        },
+      },
       tasks: {
         create: [
           {
@@ -61,6 +68,12 @@ async function main() {
       email: 'alice@gmail.com',
       username: 'alice',
       password: passwordHash,
+      roles: {
+        connectOrCreate: {
+          where: { name: Role.Admin },
+          create: { name: Role.Admin },
+        },
+      },
       tasks: {
         create: [
           {
@@ -98,6 +111,12 @@ async function main() {
       email: 'john.doe@gmail.com',
       username: 'john.doe',
       password: passwordHash,
+      roles: {
+        connectOrCreate: {
+          where: { name: Role.User },
+          create: { name: Role.User },
+        },
+      },
       tasks: {
         create: [
           {
