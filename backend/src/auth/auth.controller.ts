@@ -1,7 +1,15 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Res,
+} from '@nestjs/common';
 import { LoginRegisterDTO, UserRegisterDTO } from './dtos/user';
 import { AuthService } from './services/auth.service';
 import { Public } from './decorators/public.decorator';
+import type { Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
@@ -18,8 +26,20 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   @Post('login')
   @Public()
-  async login(@Body() dto: LoginRegisterDTO) {
+  async login(
+    @Body() dto: LoginRegisterDTO,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const authUser = await this.authService.login(dto);
+    const { token } = authUser;
+
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+
     return authUser;
   }
 }
