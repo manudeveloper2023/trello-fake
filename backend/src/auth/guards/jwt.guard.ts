@@ -27,7 +27,7 @@ export class JwtGuard implements CanActivate {
 
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromCookie(request);
-
+    console.log('Extracted token:', token);
     if (!token) {
       throw new UnauthorizedException('No token provided.');
     }

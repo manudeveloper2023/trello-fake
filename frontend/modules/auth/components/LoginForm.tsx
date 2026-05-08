@@ -14,6 +14,7 @@ import { useForm } from "react-hook-form"
 import { formSchema, LoginFormValues } from "../schemas/login.schema"
 import { login } from "../services/auth.service"
 import { useState } from "react"
+import { redirect } from "next/navigation"
 
 export default function LoginForm() {
   const [isLoading, setLoading] = useState(false)
@@ -40,6 +41,7 @@ export default function LoginForm() {
       setError("password", { message: "Invalid email or password" })
     } finally {
       setLoading(false)
+      redirect("/dashboard")
     }
   }
 

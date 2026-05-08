@@ -16,3 +16,12 @@ export const loginAPI = async ({
     throw error
   }
 }
+
+export const logoutAPI = async () => {
+  try {
+    await http.post("/auth/logout")
+  } catch (error) {
+    console.error("Logout error:", error)
+    throw error
+  }
+}
