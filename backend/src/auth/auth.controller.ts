@@ -18,8 +18,19 @@ export class AuthController {
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
   @Public()
-  async register(@Body() dto: UserRegisterDTO) {
+  async register(
+    @Body() dto: UserRegisterDTO,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     const authUser = await this.authService.register(dto);
+    const { token } = authUser;
+    // TODO : Set secure to true in production
+    res.cookie('access_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
     return authUser;
   }
 

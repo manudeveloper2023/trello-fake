@@ -3,7 +3,13 @@ export interface AuthLoginRequest {
   password: string
 }
 
-export interface AuthLoginResponse {
+export interface AuthResponse {
   message: string
   token: string
+}
+
+export interface AuthRegisterRequest {
+  email: string
+  password: string
+  username: string
 }

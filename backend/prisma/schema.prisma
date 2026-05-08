@@ -23,8 +23,7 @@ model User {
   roles Roles[]
   @@map("users")
 }
-
-model Roles {
+ model Roles {
   id   Int    @id @default(autoincrement())
   name String @unique
   users User[] 

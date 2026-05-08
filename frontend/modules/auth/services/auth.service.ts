@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation"
-import { loginAPI, logoutAPI } from "../apis/auth.api"
-import { AuthLoginRequest } from "../apis/auth.types"
+import { loginAPI, logoutAPI, registerAPI } from "../apis/auth.api"
+import { AuthLoginRequest, AuthRegisterRequest } from "../apis/auth.types"
 export const login = async ({ email, password }: AuthLoginRequest) => {
   try {
     const data = await loginAPI({ email, password })
@@ -12,6 +12,25 @@ export const login = async ({ email, password }: AuthLoginRequest) => {
     return data
   } catch (error) {
     console.error("Login error:", error)
+    throw error
+  }
+}
+
+export const register = async ({
+  email,
+  password,
+  username,
+}: AuthRegisterRequest) => {
+  try {
+    const data = await registerAPI({ email, password, username })
+
+    if (!data?.token) {
+      throw new Error("Invalid register response")
+    }
+
+    return data
+  } catch (error) {
+    console.error("Register error:", error)
     throw error
   }
 }
