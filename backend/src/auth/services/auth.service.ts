@@ -34,7 +34,6 @@ export class AuthService {
     const payload = { sub: createdUser.id, email: createdUser.email };
     const token = this.jwtService.sign(payload);
 
-    // TODO  : Insert in cookie instead of returning the token in the response body
     return {
       message: 'User registered successfully.',
       token,
@@ -59,7 +58,6 @@ export class AuthService {
     const payload = { sub: authUser.id, email: authUser.email };
     const token = this.jwtService.sign(payload);
 
-    // TODO  : Insert in cookie instead of returning the token in the response body
     return {
       message: 'User logged in successfully.',
       token,
