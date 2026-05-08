@@ -11,7 +11,7 @@ import {
 import CustomInput from "@/modules/shared/components/Input"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { formSchema, LoginFormValues } from "../schemas/login.schema"
+import { loginFormSchema, LoginFormValues } from "../schemas/login.schema"
 import { login } from "../services/auth.service"
 import { useState } from "react"
 import { redirect } from "next/navigation"
@@ -24,7 +24,7 @@ export default function LoginForm() {
     setError,
     formState: { isValid },
   } = useForm<LoginFormValues>({
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(loginFormSchema),
     defaultValues: {
       email: "",
       password: "",
