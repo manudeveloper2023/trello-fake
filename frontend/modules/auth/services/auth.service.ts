@@ -1,4 +1,5 @@
-import { loginAPI } from "../apis/auth.api"
+import { redirect } from "next/navigation"
+import { loginAPI, logoutAPI } from "../apis/auth.api"
 import { AuthLoginRequest } from "../apis/auth.types"
 export const login = async ({ email, password }: AuthLoginRequest) => {
   try {
@@ -11,6 +12,16 @@ export const login = async ({ email, password }: AuthLoginRequest) => {
     return data
   } catch (error) {
     console.error("Login error:", error)
+    throw error
+  }
+}
+
+export const logout = async () => {
+  try {
+    await logoutAPI()
+    redirect("/login")
+  } catch (error) {
+    console.error("Logout error:", error)
     throw error
   }
 }
