@@ -26,7 +26,7 @@ export class TaskService implements TaskServiceInterface {
   async getAllTasksForUser(userId: string): Promise<any[]> {
     const tasks = await this.prisma.task.findMany({
       where: {
-        userId: String(userId),
+        creatorId: userId,
       },
     });
 

@@ -19,28 +19,124 @@ model User {
   email    String   @unique
   username String   @unique
   password String
-  tasks    Task[]   
-  roles Roles[]
+
+  // workspaces donde participa
+  memberWorkspaces WorkspaceMember[] @relation("WorkspaceMembers")
+
+
+
+  // workspaces creados por el usuario
+  ownedWorkspaces Workspace[] @relation("WorkspaceOwner")
+  createdTasks Task[] @relation("CreatedTasks")
+  assignedTasks Task[] @relation("AssignedTasks")
   @@map("users")
 }
- model Roles {
-  id   Int    @id @default(autoincrement())
-  name String @unique
-  users User[] 
-  @@map("roles")
+
+
+
+
+ model WorkspaceRole {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  permissions Json? 
+
+  members WorkspaceMember[]
+
+  @@map("workspace_roles")
 }
 
 
+model WorkspaceMember {
+  id Int @id @default(autoincrement())
+
+  userId String
+  user User @relation(fields: [userId], references: [id] , name: "WorkspaceMembers")
+
+  workspaceId Int
+  workspace Workspace @relation(fields: [workspaceId], references: [id] , name: "WorkspaceMembers")
+
+  roleId Int
+  role WorkspaceRole @relation(fields: [roleId], references: [id])
+
+  joinedAt DateTime @default(now())
+
+  @@unique([userId, workspaceId])
+  @@map("workspace_members")
+}
+
+
+model Workspace {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+
+  // dueño del workspace
+  ownerId String
+  owner User @relation("WorkspaceOwner",fields: [ownerId],references: [id])
+
+  workspaceMembers WorkspaceMember[] @relation("WorkspaceMembers")
+
+  // boards dentro del workspace
+  boards Board[]
+
+  @@map("workspaces")
+}
+
+
+model Board {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+
+  workspaceId Int
+  workspace Workspace @relation(fields: [workspaceId],references: [id])
+
+  columns Column[]
+  tasks   Task[]
+
+  @@map("boards")
+}
+model Column {
+  id       Int    @id @default(autoincrement())
+  name     String
+
+  boardId Int
+  board   Board @relation(fields: [boardId], references: [id])
+
+  tasks Task[]
+
+  @@map("columns")
+}
 model Task {
   id          Int      @id @default(autoincrement())
   title       String
   description String?
   completed   Boolean  @default(false)
+
+  position Int
+
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+
+
+  creatorId String
+  creator   User @relation("CreatedTasks", fields: [creatorId], references: [id])
+
+  assignedToId String?
+  assignedTo   User? @relation("AssignedTasks", fields: [assignedToId], references: [id])
+
+  columnId Int
+  column   Column @relation(fields: [columnId], references: [id])
+
+  boardId Int
+  board   Board @relation(fields: [boardId], references: [id])
+
+
+
   tags        Tag[]   
-  user  User   @relation(fields: [userId], references: [id])
-  userId String
   @@map("tasks")
 }
 
