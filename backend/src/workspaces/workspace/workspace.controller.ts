@@ -10,16 +10,27 @@ import {
 } from '@nestjs/common';
 import { WorkspaceService } from './workspace.service';
 import { WorkspaceOwnerGuard } from './decorators/workspace-owner.guard';
-import { GetUser } from 'src/shared/decorators/get-user-id.decorator';
+import { GetUser } from 'src/shared/prisma/decorators/get-user-id.decorator';
 import { CreateWorkspaceDTO } from './dtos/workspace-create.dto';
 import { UpdateWorkspaceDTO } from './dtos/workspace-update.dto';
 
 @Controller({})
 export class WorkspaceController {
   constructor(private readonly workspaceService: WorkspaceService) {}
+
   @Get('/workspaces')
-  async getWorkspacesForUser() {
-    // lógica para obtener los workspaces de un usuario
+  async getWorkspacesForUser(@GetUser('id') userId: string) {
+    const workspaces = await this.workspaceService.getWorkspacesForUser(userId);
+
+    if (workspaces.length === 0) {
+      return {
+        message: 'No workspaces found for this user.',
+      };
+    }
+    return {
+      message: 'Workspaces retrieved successfully',
+      data: workspaces,
+    };
   }
 
   @Post('/workspaces')
