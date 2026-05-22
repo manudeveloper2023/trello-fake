@@ -3,20 +3,25 @@ import {
   Controller,
   Delete,
   Get,
+  Inject,
   Param,
   Post,
   Put,
   UseGuards,
 } from '@nestjs/common';
 import { WorkspaceService } from './workspace.service';
-import { WorkspaceOwnerGuard } from './decorators/workspace-owner.guard';
+import { WorkspaceOwnerGuard } from './guards/workspace-owner.guard';
 import { GetUser } from 'src/shared/prisma/decorators/get-user-id.decorator';
 import { CreateWorkspaceDTO } from './dtos/workspace-create.dto';
 import { UpdateWorkspaceDTO } from './dtos/workspace-update.dto';
+import { WorkspacesTokens } from '../workspaces.tokens';
 
 @Controller({})
 export class WorkspaceController {
-  constructor(private readonly workspaceService: WorkspaceService) {}
+  constructor(
+    @Inject(WorkspacesTokens.WorkspaceService)
+    private readonly workspaceService: WorkspaceService,
+  ) {}
 
   @Get('/workspaces')
   async getWorkspacesForUser(@GetUser('id') userId: string) {

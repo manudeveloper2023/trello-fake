@@ -98,6 +98,7 @@ model Board {
 
   @@map("boards")
 }
+
 model Column {
   id       Int    @id @default(autoincrement())
   name     String

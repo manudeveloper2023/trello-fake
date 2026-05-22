@@ -3,6 +3,7 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Inject,
   Post,
   Res,
 } from '@nestjs/common';
@@ -10,10 +11,14 @@ import { LoginRegisterDTO, UserRegisterDTO } from './dtos/user';
 import { AuthService } from './services/auth.service';
 import { Public } from './decorators/public.decorator';
 import type { Response } from 'express';
+import { AuthTokens } from './auth.tokens';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    @Inject(AuthTokens.AuthService)
+    private readonly authService: AuthService,
+  ) {}
 
   @HttpCode(HttpStatus.CREATED)
   @Post('register')

@@ -1,10 +1,16 @@
 import { Module } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserController } from './user.controller';
+import { IdentityTokens } from '../identity.tokens';
 
 @Module({
-  providers: [UserService],
+  providers: [
+    {
+      provide: IdentityTokens.UserService,
+      useClass: UserService,
+    },
+  ],
   controllers: [UserController],
-  exports: [UserService],
+  exports: [IdentityTokens.UserService],
 })
 export class UserModule {}
