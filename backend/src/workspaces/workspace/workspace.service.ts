@@ -3,6 +3,8 @@ import { CreateWorkspaceDTO } from './dtos/workspace-create.dto';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { UpdateWorkspaceDTO } from './dtos/workspace-update.dto';
 import { SharedTokens } from 'src/shared/shared.tokens';
+import { WorkspaceRole } from './decorators/workspace-role.decorator';
+import { WORKSPACE_ROLES } from './workspace.constants';
 export interface WorkspaceServiceInterface {
   getWorkspacesForUser(userId: string): Promise<any[]>;
   createWorkspace(ownerId: string, workspace: CreateWorkspaceDTO): Promise<any>;
@@ -42,10 +44,16 @@ export class WorkspaceService implements WorkspaceServiceInterface {
     ownerId: string,
     workspace: CreateWorkspaceDTO,
   ): Promise<any> {
-    const workspaceCreated = this.prismaService.workspace.create({
+    const workspaceCreated = await this.prismaService.workspace.create({
       data: {
         name: workspace.name,
         ownerId,
+        workspaceMembers: {
+          create: {
+            userId: ownerId,
+            roleId: WORKSPACE_ROLES.OWNER,
+          },
+        },
       },
     });
 
@@ -69,12 +77,12 @@ export class WorkspaceService implements WorkspaceServiceInterface {
       },
     });
   }
-  updateWorkspace(
+  async updateWorkspace(
     userId: string,
     workspaceId: number,
     workspace: UpdateWorkspaceDTO,
   ): Promise<any> {
-    const updatedWorkspace = this.prismaService.workspace.update({
+    const updatedWorkspace = await this.prismaService.workspace.update({
       where: {
         id: workspaceId,
         ownerId: userId,

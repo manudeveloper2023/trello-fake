@@ -10,13 +10,15 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { WorkspaceService } from './workspace.service';
-import { WorkspaceOwnerGuard } from './guards/workspace-owner.guard';
 import { GetUser } from 'src/shared/prisma/decorators/get-user-id.decorator';
 import { CreateWorkspaceDTO } from './dtos/workspace-create.dto';
 import { UpdateWorkspaceDTO } from './dtos/workspace-update.dto';
 import { WorkspacesTokens } from '../workspaces.tokens';
+import { WorkspaceRoleGuard } from './guards/workspace-role.guards';
+import { Roles, WorkspaceRole } from './decorators/workspace-role.decorator';
 
 @Controller({})
+@UseGuards(WorkspaceRoleGuard)
 export class WorkspaceController {
   constructor(
     @Inject(WorkspacesTokens.WorkspaceService)
@@ -54,7 +56,7 @@ export class WorkspaceController {
     };
   }
 
-  @UseGuards(WorkspaceOwnerGuard)
+  @Roles(WorkspaceRole.OWNER)
   @Delete('/workspaces/:workspaceId')
   async deleteWorkspace(
     @GetUser('id') userId: string,
@@ -67,7 +69,7 @@ export class WorkspaceController {
     };
   }
 
-  @UseGuards(WorkspaceOwnerGuard)
+  @Roles(WorkspaceRole.OWNER)
   @Put('/workspaces/:workspaceId')
   async updateWorkspace(
     @GetUser('id') userId: string,
