@@ -1,15 +1,19 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { LoginRegisterDTO, UserRegisterDTO } from '../dtos/user';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import { UserService } from 'src/identity/users/user.service';
+import { SharedTokens } from 'src/shared/shared.tokens';
+import { IdentityTokens } from 'src/identity/identity.tokens';
 
 @Injectable({})
 export class AuthService {
   constructor(
+    @Inject(SharedTokens.PrismaService)
     private readonly prisma: PrismaService,
     private readonly jwtService: JwtService,
+    @Inject(IdentityTokens.UserService)
     private readonly userService: UserService,
   ) {}
   async register(user: UserRegisterDTO) {

@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateWorkspaceDTO } from './dtos/workspace-create.dto';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { UpdateWorkspaceDTO } from './dtos/workspace-update.dto';
+import { SharedTokens } from 'src/shared/shared.tokens';
 export interface WorkspaceServiceInterface {
   getWorkspacesForUser(userId: string): Promise<any[]>;
   createWorkspace(ownerId: string, workspace: CreateWorkspaceDTO): Promise<any>;
@@ -12,9 +13,13 @@ export interface WorkspaceServiceInterface {
     workspace: UpdateWorkspaceDTO,
   ): Promise<any>;
 }
+
 @Injectable({})
 export class WorkspaceService implements WorkspaceServiceInterface {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    @Inject(SharedTokens.PrismaService)
+    private readonly prismaService: PrismaService,
+  ) {}
   async getWorkspacesForUser(userId: string): Promise<any[]> {
     const workspaces = await this.prismaService.workspace.findMany({
       where: {

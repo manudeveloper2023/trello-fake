@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { UpdateTaskDto } from './dtos/update-task.dto';
+import { SharedTokens } from 'src/shared/shared.tokens';
 
 export interface TaskServiceInterface {
   getAllTasksForUser(userId: string): Promise<any[]>;
@@ -8,7 +9,10 @@ export interface TaskServiceInterface {
 }
 @Injectable()
 export class TaskService implements TaskServiceInterface {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    @Inject(SharedTokens.PrismaService)
+    private readonly prisma: PrismaService,
+  ) {}
 
   async updateTask(taskId: number, body: UpdateTaskDto): Promise<any> {
     try {

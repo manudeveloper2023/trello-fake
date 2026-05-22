@@ -1,37 +1,66 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { CreateBoardDTO } from './dtos/create-board.dto';
 import { UpdateBoardDTO } from './dtos/update-board.dto';
+import { SharedTokens } from 'src/shared/shared.tokens';
 
 export interface BoardServiceInterface {
-  allBoardsForUser(userId: string): Promise<any[]>;
-  createBoard(userId: string, board: CreateBoardDTO): Promise<any>;
-  updateBoard(
-    userId: string,
-    boardId: string,
-    body: UpdateBoardDTO,
-  ): Promise<any>;
+  allBoardsForWorkspace(userId: string, workspaceId: number): Promise<any[]>;
+  createBoard(workspaceId: number, board: CreateBoardDTO): Promise<any>;
+  updateBoard(boardId: string, body: UpdateBoardDTO): Promise<any>;
+  deleteBoard(boardId: string): Promise<void>;
 }
 
 @Injectable({})
-export class BoardService {
-  constructor(private readonly prisma: PrismaService) {}
+export class BoardService implements BoardServiceInterface {
+  constructor(
+    @Inject(SharedTokens.PrismaService)
+    private readonly prisma: PrismaService,
+  ) {}
 
-  async updateBoard(
+  async allBoardsForWorkspace(
     userId: string,
-    boardId: string,
-    body: UpdateBoardDTO,
-  ): Promise<any> {
-    const userExists = await this.prisma.user.findUnique({
+    workspaceId: number,
+  ): Promise<any[]> {
+    const boards = await this.prisma.board.findMany({
       where: {
-        id: userId,
+        workspace: {
+          id: Number(workspaceId),
+          workspaceMembers: {
+            some: {
+              userId,
+            },
+          },
+        },
       },
     });
 
-    if (!userExists) {
-      throw new NotFoundException('User not found');
+    return boards;
+  }
+
+  //todo : ADD RBAC CHECKS TO THIS FUNCTION LATER
+  async createBoard(workspaceId: number, board: CreateBoardDTO): Promise<any> {
+    const workspaceExists = await this.prisma.workspace.findUnique({
+      where: {
+        id: Number(workspaceId),
+      },
+    });
+
+    if (!workspaceExists) {
+      throw new NotFoundException('Workspace not found');
     }
 
+    const createdBoard = await this.prisma.board.create({
+      data: {
+        name: board.name,
+        workspaceId: board.workspaceId,
+      },
+    });
+
+    return createdBoard;
+  }
+
+  async updateBoard(boardId: string, body: UpdateBoardDTO): Promise<any> {
     const boardExists = await this.prisma.board.findUnique({
       where: {
         id: Number(boardId),
@@ -52,5 +81,23 @@ export class BoardService {
     });
 
     return updatedBoard;
+  }
+
+  async deleteBoard(boardId: string): Promise<void> {
+    const boardExists = await this.prisma.board.findUnique({
+      where: {
+        id: Number(boardId),
+      },
+    });
+
+    if (!boardExists) {
+      throw new NotFoundException('Board not found');
+    }
+
+    await this.prisma.board.delete({
+      where: {
+        id: Number(boardId),
+      },
+    });
   }
 }

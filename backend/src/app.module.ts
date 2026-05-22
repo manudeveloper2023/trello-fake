@@ -11,6 +11,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { UserModule } from './identity/users/user.module';
 import { WorkspaceModule } from './workspaces/workspace/workspace.module';
+import { BoardModule } from './workspaces/boards/board/board.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { WorkspaceModule } from './workspaces/workspace/workspace.module';
     TaskModule,
     PrismaModule,
     UserModule,
+    BoardModule,
     WorkspaceModule,
     JwtModule.registerAsync({
       global: true,
