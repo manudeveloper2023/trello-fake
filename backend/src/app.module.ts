@@ -12,6 +12,8 @@ import { JwtGuard } from './auth/guards/jwt.guard';
 import { UserModule } from './identity/users/user.module';
 import { WorkspaceModule } from './workspaces/workspace/workspace.module';
 import { BoardModule } from './workspaces/boards/board/board.module';
+import { SharedRoleModule } from './shared/roles/role.module';
+import { ColumnModule } from './workspaces/boards/column/column.module';
 
 @Module({
   imports: [
@@ -20,9 +22,11 @@ import { BoardModule } from './workspaces/boards/board/board.module';
     }),
     TaskModule,
     PrismaModule,
+    SharedRoleModule,
     UserModule,
     BoardModule,
     WorkspaceModule,
+    ColumnModule,
     JwtModule.registerAsync({
       global: true,
       imports: [ConfigModule],

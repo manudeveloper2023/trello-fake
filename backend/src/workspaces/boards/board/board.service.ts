@@ -38,7 +38,6 @@ export class BoardService implements BoardServiceInterface {
     return boards;
   }
 
-  //todo : ADD RBAC CHECKS TO THIS FUNCTION LATER
   async createBoard(workspaceId: number, board: CreateBoardDTO): Promise<any> {
     const workspaceExists = await this.prisma.workspace.findUnique({
       where: {

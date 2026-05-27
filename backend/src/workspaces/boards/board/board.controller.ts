@@ -6,9 +6,9 @@ import {
   Inject,
   Param,
   ParseIntPipe,
-  ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { WorkspacesTokens } from 'src/workspaces/workspaces.tokens';
@@ -19,8 +19,10 @@ import {
   Roles,
   WorkspaceRole,
 } from 'src/workspaces/workspace/decorators/workspace-role.decorator';
+import { WorkspaceRoleGuard } from 'src/workspaces/workspace/guards/workspace-role.guards';
 
 @Controller('workspaces/:workspaceId')
+@UseGuards(WorkspaceRoleGuard)
 export class BoardController {
   constructor(
     @Inject(WorkspacesTokens.BoardService)
@@ -28,6 +30,7 @@ export class BoardController {
   ) {}
 
   @Get('boards')
+  @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async getBoardsForWorkspace(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
     @GetUser('id') userId: string,
