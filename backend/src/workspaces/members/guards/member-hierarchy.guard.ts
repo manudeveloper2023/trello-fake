@@ -6,18 +6,18 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { SharedTokens } from 'src/shared/shared.tokens';
-import { AccessService } from 'src/shared/roles/services/access.service';
 import { ROLE_HIERARCHY } from 'src/shared/roles/role.hierarchy';
 import { Reflector } from '@nestjs/core';
 import { HIERARCHY_KEY } from '../decorators/check-hierarchy.decorator';
+import { WorkspacesTokens } from 'src/workspaces/workspaces.tokens';
+import { RoleService } from '../roles/role.service';
 
 @Injectable()
 export class MemberHiearchyGuard implements CanActivate {
   constructor(
-    @Inject(SharedTokens.AccessService)
-    private readonly accessService: AccessService,
     private readonly reflector: Reflector,
+    @Inject(WorkspacesTokens.MemberRoleService)
+    private readonly accessService: RoleService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -67,6 +67,10 @@ export class MemberHiearchyGuard implements CanActivate {
 
     if (!targetMemberRole) {
       throw new NotFoundException('Target member not found in workspace');
+    }
+
+    if (userId === memberToModifyId) {
+      throw new ForbiddenException('You cannot modify by yourself');
     }
 
     if (ROLE_HIERARCHY[userRole] <= ROLE_HIERARCHY[targetMemberRole]) {

@@ -1,12 +1,20 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { SharedTokens } from 'src/shared/shared.tokens';
-import { WORKSPACE_ROLES } from '../workspace/workspace.constants';
+import {
+  Roles,
+  WorkspaceRole,
+} from '../workspace/decorators/workspace-role.decorator';
+import { AddMemberDTO } from './dtos/add-member.dto';
 
 export interface MemberServiceInterface {
   findAllMembersForWorkspace(workspaceId: number): Promise<any[]>;
   deleteMemberFromWorkspace(workspaceId: number, userId: string): Promise<void>;
-  addMemberToWorkspace(workspaceId: number, userId: string): Promise<any>;
+  addMemberToWorkspace(
+    workspaceId: number,
+    userId: string,
+    body: AddMemberDTO,
+  ): Promise<any>;
 }
 @Injectable({})
 export class MemberService implements MemberServiceInterface {
@@ -20,8 +28,20 @@ export class MemberService implements MemberServiceInterface {
       where: {
         workspaceId: Number(workspaceId),
       },
-      include: {
-        user: true,
+      select: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+        role: {
+          select: {
+            name: true,
+          },
+        },
+        joinedAt: true,
       },
     });
     return members;
@@ -42,6 +62,7 @@ export class MemberService implements MemberServiceInterface {
   async addMemberToWorkspace(
     workspaceId: number,
     userId: string,
+    body: AddMemberDTO,
   ): Promise<any> {
     const existingMember = await this.prismaService.workspaceMember.findFirst({
       where: {
@@ -58,7 +79,22 @@ export class MemberService implements MemberServiceInterface {
       data: {
         userId: userId,
         workspaceId: Number(workspaceId),
-        roleId: WORKSPACE_ROLES.MEMBER,
+        roleId: body.roleId,
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+          },
+        },
+        role: {
+          select: {
+            name: true,
+          },
+        },
+        joinedAt: true,
       },
     });
 

@@ -5,6 +5,7 @@ export enum WorkspaceRole {
   ADMIN = 'ADMIN',
   MEMBER = 'MEMBER',
   VIEWER = 'VIEWER',
+  ALL = 'ALL',
 }
 export const ROLES_KEY = 'roles';
 

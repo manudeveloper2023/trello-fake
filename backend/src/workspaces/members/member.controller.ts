@@ -14,9 +14,16 @@ import { WorkspacesTokens } from '../workspaces.tokens';
 import { MemberService } from './member.service';
 import { CheckHierarchy } from './decorators/check-hierarchy.decorator';
 import { MemberHiearchyGuard } from './guards/member-hierarchy.guard';
+import { AddMemberDTO } from './dtos/add-member.dto';
+import { CanAssignMemberGuard } from './guards/can-assign-member.guard';
+import {
+  Roles,
+  WorkspaceRole,
+} from '../workspace/decorators/workspace-role.decorator';
+import { WorkspaceRoleGuard } from '../workspace/guards/workspace-role.guards';
 
 @Controller('/workspaces/:workspaceId/members')
-@UseGuards(MemberHiearchyGuard)
+@UseGuards(MemberHiearchyGuard, WorkspaceRoleGuard)
 export class MemberController {
   constructor(
     @Inject(WorkspacesTokens.MemberService)
@@ -24,6 +31,7 @@ export class MemberController {
   ) {}
 
   @Get()
+  @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async findAllMembersForWorkspace(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
   ) {
@@ -43,14 +51,16 @@ export class MemberController {
   }
 
   @Post(':memberId')
-  @CheckHierarchy('memberId')
-  async addMemberToWorkspace(
+  @UseGuards(CanAssignMemberGuard)
+  async addMemberRoleToWorkspace(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
     @Param('memberId', ParseUUIDPipe) userId: string,
+    @Body() AddMemberDTO: AddMemberDTO,
   ) {
     const member = await this.memberService.addMemberToWorkspace(
       workspaceId,
       userId,
+      AddMemberDTO,
     );
 
     return {

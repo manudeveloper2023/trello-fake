@@ -14,6 +14,8 @@ import { WorkspaceModule } from './workspaces/workspace/workspace.module';
 import { BoardModule } from './workspaces/boards/board/board.module';
 import { SharedRoleModule } from './shared/roles/role.module';
 import { ColumnModule } from './workspaces/boards/column/column.module';
+import { MemberModule } from './workspaces/members/member.module';
+import { RoleModule } from './workspaces/members/roles/role.module';
 
 @Module({
   imports: [
@@ -25,6 +27,8 @@ import { ColumnModule } from './workspaces/boards/column/column.module';
     SharedRoleModule,
     UserModule,
     BoardModule,
+    MemberModule,
+    RoleModule,
     WorkspaceModule,
     ColumnModule,
     JwtModule.registerAsync({
