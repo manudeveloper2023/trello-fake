@@ -46,4 +46,18 @@ export class AccessService {
 
     return !!board;
   }
+
+  async getUserRoleInWorkspace(userId: string, workspaceId: number) {
+    const membership = await this.prisma.workspaceMember.findFirst({
+      where: {
+        userId,
+        workspaceId,
+      },
+      include: {
+        role: true,
+      },
+    });
+
+    return membership?.role.name || null;
+  }
 }

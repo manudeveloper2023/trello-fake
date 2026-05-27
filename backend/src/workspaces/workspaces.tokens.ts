@@ -4,4 +4,5 @@ export enum WorkspacesTokens {
   ColumnService = 'ColumnService',
   TaskService = 'TaskService',
   TagService = 'TagService',
+  MemberService = 'MemberService',
 }
