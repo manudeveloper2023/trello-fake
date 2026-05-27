@@ -6,24 +6,31 @@ import {
   Inject,
   Param,
   ParseIntPipe,
-  ParseUUIDPipe,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { BoardService } from './board.service';
 import { WorkspacesTokens } from 'src/workspaces/workspaces.tokens';
 import { GetUser } from 'src/shared/prisma/decorators/get-user-id.decorator';
 import { CreateBoardDTO } from './dtos/create-board.dto';
 import { UpdateBoardDTO } from './dtos/update-board.dto';
+import {
+  Roles,
+  WorkspaceRole,
+} from 'src/workspaces/workspace/decorators/workspace-role.decorator';
+import { WorkspaceRoleGuard } from 'src/workspaces/workspace/guards/workspace-role.guards';
 
-@Controller('workspaces')
+@Controller('workspaces/:workspaceId')
+@UseGuards(WorkspaceRoleGuard)
 export class BoardController {
   constructor(
     @Inject(WorkspacesTokens.BoardService)
     private readonly boardService: BoardService,
   ) {}
 
-  @Get(':workspaceId/boards')
+  @Get('boards')
+  @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async getBoardsForWorkspace(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
     @GetUser('id') userId: string,
@@ -33,13 +40,20 @@ export class BoardController {
       workspaceId,
     );
 
+    if (boards.length === 0) {
+      return {
+        message: 'No boards found for this workspace',
+      };
+    }
+
     return {
       message: 'Boards retrieved successfully',
       data: boards,
     };
   }
 
-  @Post(':workspaceId/boards')
+  @Post('boards')
+  @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
   async createBoard(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
     @Body() board: CreateBoardDTO,
@@ -55,9 +69,10 @@ export class BoardController {
     };
   }
 
-  @Put(':workspaceId/boards/:boardId')
+  @Put('boards/:boardId')
+  @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
   async updateBoard(
-    @Param('boardId', ParseUUIDPipe) boardId: string,
+    @Param('boardId', ParseIntPipe) boardId: number,
     @Body() body: UpdateBoardDTO,
   ) {
     const updatedBoard = await this.boardService.updateBoard(boardId, body);
@@ -68,8 +83,9 @@ export class BoardController {
     };
   }
 
-  @Delete(':workspaceId/boards/:boardId')
-  async deleteBoard(@Param('boardId', ParseUUIDPipe) boardId: string) {
+  @Delete('boards/:boardId')
+  @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
+  async deleteBoard(@Param('boardId', ParseIntPipe) boardId: number) {
     await this.boardService.deleteBoard(boardId);
 
     return {

@@ -3,6 +3,7 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from 'src/generated/prisma/client';
 import bcrypt from 'bcrypt';
+import { WorkspaceRole } from 'src/workspaces/workspace/decorators/workspace-role.decorator';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const adapter = new PrismaPg(pool);
@@ -11,41 +12,277 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   const passwordHash = await bcrypt.hash('12345678', 10);
 
-  const users = [
-    {
-      email: 'sarah.chen@trello-fake.dev',
-      username: 'sarahchen',
-      password: passwordHash,
-    },
-    {
-      email: 'mike.johnson@trello-fake.dev',
-      username: 'mikejohnson',
-      password: passwordHash,
-    },
-    {
-      email: 'laura.garcia@trello-fake.dev',
-      username: 'lauragarcia',
-      password: passwordHash,
-    },
-    {
-      email: 'david.lee@trello-fake.dev',
-      username: 'davidlee',
-      password: passwordHash,
-    },
-  ];
+  await prisma.$transaction(async (tx) => {
+    await tx.task.deleteMany();
+    await tx.column.deleteMany();
+    await tx.board.deleteMany();
+    await tx.workspaceMember.deleteMany();
+    await tx.workspace.deleteMany();
+    await tx.tag.deleteMany();
+    await tx.workspaceRole.deleteMany();
+    await tx.user.deleteMany();
 
-  await Promise.all(
-    users.map((user) =>
-      prisma.user.upsert({
-        where: { email: user.email },
-        update: {
-          username: user.username,
-          password: user.password,
+    const [ana, bruno, carla] = await Promise.all([
+      tx.user.create({
+        data: {
+          email: 'ana@demo.com',
+          username: 'ana',
+          password: passwordHash,
         },
-        create: user,
       }),
-    ),
-  );
+      tx.user.create({
+        data: {
+          email: 'bruno@demo.com',
+          username: 'bruno',
+          password: passwordHash,
+        },
+      }),
+      tx.user.create({
+        data: {
+          email: 'carla@demo.com',
+          username: 'carla',
+          password: passwordHash,
+        },
+      }),
+    ]);
+
+    const [ownerRole, adminRole, memberRole, viewerRole] = await Promise.all([
+      tx.workspaceRole.create({
+        data: {
+          name: WorkspaceRole.OWNER,
+          permissions: {
+            manageWorkspace: true,
+            manageMembers: true,
+            manageBoards: true,
+          },
+        },
+      }),
+      tx.workspaceRole.create({
+        data: {
+          name: WorkspaceRole.ADMIN,
+          permissions: {
+            manageMembers: true,
+            manageBoards: true,
+            manageTasks: true,
+          },
+        },
+      }),
+      tx.workspaceRole.create({
+        data: {
+          name: WorkspaceRole.MEMBER,
+          permissions: { manageTasks: true },
+        },
+      }),
+      tx.workspaceRole.create({
+        data: {
+          name: WorkspaceRole.VIEWER,
+          permissions: { viewOnly: true },
+        },
+      }),
+    ]);
+
+    const [productWorkspace, marketingWorkspace] = await Promise.all([
+      tx.workspace.create({
+        data: {
+          name: 'Producto',
+          ownerId: ana.id,
+        },
+      }),
+      tx.workspace.create({
+        data: {
+          name: 'Marketing',
+          ownerId: bruno.id,
+        },
+      }),
+    ]);
+
+    await Promise.all([
+      tx.workspaceMember.create({
+        data: {
+          userId: ana.id,
+          workspaceId: productWorkspace.id,
+          roleId: ownerRole.id,
+        },
+      }),
+      tx.workspaceMember.create({
+        data: {
+          userId: bruno.id,
+          workspaceId: productWorkspace.id,
+          roleId: adminRole.id,
+        },
+      }),
+      tx.workspaceMember.create({
+        data: {
+          userId: carla.id,
+          workspaceId: productWorkspace.id,
+          roleId: viewerRole.id,
+        },
+      }),
+      tx.workspaceMember.create({
+        data: {
+          userId: bruno.id,
+          workspaceId: marketingWorkspace.id,
+          roleId: ownerRole.id,
+        },
+      }),
+      tx.workspaceMember.create({
+        data: {
+          userId: carla.id,
+          workspaceId: marketingWorkspace.id,
+          roleId: memberRole.id,
+        },
+      }),
+    ]);
+
+    const [productBoard, roadmapBoard, marketingBoard] = await Promise.all([
+      tx.board.create({
+        data: {
+          name: 'Sprint Board',
+          workspaceId: productWorkspace.id,
+        },
+      }),
+      tx.board.create({
+        data: {
+          name: 'Roadmap',
+          workspaceId: productWorkspace.id,
+        },
+      }),
+      tx.board.create({
+        data: {
+          name: 'Campañas',
+          workspaceId: marketingWorkspace.id,
+        },
+      }),
+    ]);
+
+    const [todoColumn, doingColumn, doneColumn] = await Promise.all([
+      tx.column.create({
+        data: {
+          name: 'To do',
+          boardId: productBoard.id,
+        },
+      }),
+      tx.column.create({
+        data: {
+          name: 'Doing',
+          boardId: productBoard.id,
+        },
+      }),
+      tx.column.create({
+        data: {
+          name: 'Done',
+          boardId: productBoard.id,
+        },
+      }),
+    ]);
+
+    const [marketingTodo, marketingDone] = await Promise.all([
+      tx.column.create({
+        data: {
+          name: 'Pendientes',
+          boardId: marketingBoard.id,
+        },
+      }),
+      tx.column.create({
+        data: {
+          name: 'Publicadas',
+          boardId: marketingBoard.id,
+        },
+      }),
+    ]);
+
+    const [bugTag, featureTag, designTag, urgentTag] = await Promise.all([
+      tx.tag.create({ data: { name: 'bug' } }),
+      tx.tag.create({ data: { name: 'feature' } }),
+      tx.tag.create({ data: { name: 'design' } }),
+      tx.tag.create({ data: { name: 'urgent' } }),
+    ]);
+
+    await Promise.all([
+      tx.task.create({
+        data: {
+          title: 'Corregir login con refresco de token',
+          description:
+            'El acceso debe renovarse sin perder la sesión del usuario.',
+          completed: false,
+          position: 1,
+          creatorId: ana.id,
+          assignedToId: bruno.id,
+          columnId: todoColumn.id,
+          boardId: productBoard.id,
+          tags: {
+            connect: [{ id: bugTag.id }, { id: urgentTag.id }],
+          },
+        },
+      }),
+      tx.task.create({
+        data: {
+          title: 'Definir estados vacíos del tablero',
+          description:
+            'Agregar placeholders claros cuando una columna no tiene tareas.',
+          completed: false,
+          position: 2,
+          creatorId: ana.id,
+          assignedToId: carla.id,
+          columnId: doingColumn.id,
+          boardId: productBoard.id,
+          tags: {
+            connect: [{ id: featureTag.id }, { id: designTag.id }],
+          },
+        },
+      }),
+      tx.task.create({
+        data: {
+          title: 'Cerrar sprint de febrero',
+          description:
+            'Mover tareas terminadas y revisar pendientes del equipo.',
+          completed: true,
+          position: 3,
+          creatorId: bruno.id,
+          assignedToId: ana.id,
+          columnId: doneColumn.id,
+          boardId: productBoard.id,
+          tags: {
+            connect: [{ id: featureTag.id }],
+          },
+        },
+      }),
+      tx.task.create({
+        data: {
+          title: 'Preparar campaña de lanzamiento',
+          description:
+            'Crear copies, creatividades y calendario de publicación.',
+          completed: false,
+          position: 1,
+          creatorId: bruno.id,
+          assignedToId: carla.id,
+          columnId: marketingTodo.id,
+          boardId: marketingBoard.id,
+          tags: {
+            connect: [{ id: designTag.id }, { id: urgentTag.id }],
+          },
+        },
+      }),
+      tx.task.create({
+        data: {
+          title: 'Publicar anuncio principal',
+          description:
+            'Subir el anuncio final a las redes y monitorear resultados iniciales.',
+          completed: true,
+          position: 2,
+          creatorId: carla.id,
+          assignedToId: null,
+          columnId: marketingDone.id,
+          boardId: marketingBoard.id,
+          tags: {
+            connect: [{ id: featureTag.id }],
+          },
+        },
+      }),
+    ]);
+  });
+
+  console.log('Database seeded successfully');
 }
 
 main()

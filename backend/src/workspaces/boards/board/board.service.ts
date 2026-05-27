@@ -7,8 +7,8 @@ import { SharedTokens } from 'src/shared/shared.tokens';
 export interface BoardServiceInterface {
   allBoardsForWorkspace(userId: string, workspaceId: number): Promise<any[]>;
   createBoard(workspaceId: number, board: CreateBoardDTO): Promise<any>;
-  updateBoard(boardId: string, body: UpdateBoardDTO): Promise<any>;
-  deleteBoard(boardId: string): Promise<void>;
+  updateBoard(boardId: number, body: UpdateBoardDTO): Promise<any>;
+  deleteBoard(boardId: number): Promise<void>;
 }
 
 @Injectable({})
@@ -38,7 +38,6 @@ export class BoardService implements BoardServiceInterface {
     return boards;
   }
 
-  //todo : ADD RBAC CHECKS TO THIS FUNCTION LATER
   async createBoard(workspaceId: number, board: CreateBoardDTO): Promise<any> {
     const workspaceExists = await this.prisma.workspace.findUnique({
       where: {
@@ -53,14 +52,14 @@ export class BoardService implements BoardServiceInterface {
     const createdBoard = await this.prisma.board.create({
       data: {
         name: board.name,
-        workspaceId: board.workspaceId,
+        workspaceId: workspaceId,
       },
     });
 
     return createdBoard;
   }
 
-  async updateBoard(boardId: string, body: UpdateBoardDTO): Promise<any> {
+  async updateBoard(boardId: number, body: UpdateBoardDTO): Promise<any> {
     const boardExists = await this.prisma.board.findUnique({
       where: {
         id: Number(boardId),
@@ -83,7 +82,7 @@ export class BoardService implements BoardServiceInterface {
     return updatedBoard;
   }
 
-  async deleteBoard(boardId: string): Promise<void> {
+  async deleteBoard(boardId: number): Promise<void> {
     const boardExists = await this.prisma.board.findUnique({
       where: {
         id: Number(boardId),
