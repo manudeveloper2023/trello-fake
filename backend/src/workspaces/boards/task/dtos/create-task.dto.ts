@@ -1,7 +1,6 @@
 import {
   ArrayUnique,
   IsArray,
-  IsBoolean,
   IsInt,
   IsOptional,
   IsString,
@@ -9,20 +8,18 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class UpdateTaskDto {
-  @IsOptional()
+export class CreateTaskDTO {
   @IsString({ message: 'Task title must be a string' })
   @MinLength(3, { message: 'Task title must be at least 3 characters long' })
   @MaxLength(100, { message: 'Task title must be at most 100 characters long' })
-  title?: string;
+  title!: string;
 
   @IsOptional()
-  @IsBoolean({ message: 'Completed must be a boolean' })
-  completed?: boolean;
+  @IsString({ message: 'Task description must be a string' })
+  description?: string;
 
-  @IsOptional()
   @IsInt({ message: 'Task position must be an integer' })
-  position?: number;
+  position!: number;
 
   @IsOptional()
   @IsString({ message: 'Assigned user ID must be a string' })
@@ -32,13 +29,8 @@ export class UpdateTaskDto {
   @IsInt({ message: 'Parent task ID must be an integer' })
   parentTaskId?: number;
 
-  @IsOptional()
-  @IsInt({ message: 'Column ID must be an integer' })
-  columnId?: number;
-
-  @IsOptional()
   @IsInt({ message: 'Board ID must be an integer' })
-  boardId?: number;
+  boardId!: number;
 
   @IsOptional()
   @IsArray({ message: 'Tag IDs must be an array' })
