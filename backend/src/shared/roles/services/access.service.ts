@@ -38,6 +38,49 @@ export class AccessService {
     return !!workspace;
   }
 
+  async hasColumnAccess(userId: string, columnId: number, roles: string[]) {
+    if (roles.includes('ALL')) {
+      const columnMembership = await this.prisma.workspaceMember.findFirst({
+        where: {
+          userId,
+          workspace: {
+            boards: {
+              some: {
+                columns: {
+                  some: {
+                    id: columnId,
+                  },
+                },
+              },
+            },
+          },
+        },
+      });
+
+      return !!columnMembership;
+    }
+
+    const column = await this.prisma.column.findFirst({
+      where: {
+        id: columnId,
+        board: {
+          workspace: {
+            workspaceMembers: {
+              some: {
+                userId,
+                role: {
+                  name: { in: roles },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return !!column;
+  }
+
   async hasBoardAccess(userId: string, boardId: number, roles: string[]) {
     if (roles.includes('ALL')) {
       const boardMembership = await this.prisma.workspaceMember.findFirst({

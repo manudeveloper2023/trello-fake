@@ -30,6 +30,7 @@ import { RoleModule } from './workspaces/members/roles/role.module';
     MemberModule,
     RoleModule,
     WorkspaceModule,
+    TaskModule,
     ColumnModule,
     JwtModule.registerAsync({
       global: true,

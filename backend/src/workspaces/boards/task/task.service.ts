@@ -1,11 +1,20 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { UpdateTaskDto } from './dtos/update-task.dto';
 import { SharedTokens } from 'src/shared/shared.tokens';
+import { ReadTaskDTO } from './dtos/read-task.dto';
+import { CreateTaskDTO } from './dtos/create-task.dto';
+import { taskInclude } from './task.constants';
+import { TaskMapper } from './mappers/task.mapper';
+import { TaskTokens } from './task.tokens';
 
 export interface TaskServiceInterface {
-  getAllTasksForUser(userId: string): Promise<any[]>;
-  updateTask(taskId: number, body: UpdateTaskDto): Promise<any>;
+  updateTask(taskId: number, body: UpdateTaskDto): Promise<ReadTaskDTO>;
+  createTask(
+    creatorId: string,
+    columnId: number,
+    body: CreateTaskDTO,
+  ): Promise<ReadTaskDTO>;
 }
 @Injectable()
 export class TaskService implements TaskServiceInterface {
@@ -14,26 +23,66 @@ export class TaskService implements TaskServiceInterface {
     private readonly prisma: PrismaService,
   ) {}
 
-  async updateTask(taskId: number, body: UpdateTaskDto): Promise<any> {
-    try {
-      const updatedTask = await this.prisma.task.update({
-        where: { id: taskId },
-        data: body,
-      });
-      return updatedTask;
-    } catch (error) {
-      console.error('Error updating task:', error);
-      throw new Error('Failed to update task');
-    }
+  updateTask(taskId: number, body: UpdateTaskDto): Promise<ReadTaskDTO> {
+    throw new Error('Method not implemented.');
   }
+  async createTask(
+    creatorId: string,
+    columnId: number,
+    body: CreateTaskDTO,
+  ): Promise<ReadTaskDTO> {
+    const {
+      title,
+      description,
+      position,
+      assignedToId,
+      parentTaskId,
+      boardId,
+      tagIds,
+    } = body;
 
-  async getAllTasksForUser(userId: string): Promise<any[]> {
-    const tasks = await this.prisma.task.findMany({
+    const boardExists = await this.prisma.board.findFirst({
       where: {
-        creatorId: userId,
+        OR: [
+          { id: Number(boardId) },
+          {
+            columns: {
+              some: {
+                id: columnId,
+              },
+            },
+          },
+        ],
       },
     });
 
-    return tasks;
+    if (!boardExists) {
+      throw new NotFoundException(
+        'Board not found or column does not belong to the specified board',
+      );
+    }
+
+    const task = await this.prisma.task.create({
+      data: {
+        title,
+        description,
+        position,
+        assignedToId,
+        parentTaskId,
+        columnId,
+        boardId,
+        creatorId,
+        tags: tagIds
+          ? {
+              connect: tagIds.map((tagId) => ({ id: tagId })),
+            }
+          : undefined,
+      },
+      include: taskInclude,
+    });
+
+    const taskDTO: ReadTaskDTO = TaskMapper.toDTO(task);
+
+    return taskDTO;
   }
 }

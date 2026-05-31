@@ -37,12 +37,18 @@ export class WorkspaceRoleGuard implements CanActivate {
 
     const boardId = req.params.boardId ? Number(req.params.boardId) : null;
 
+    const columnId = req.params.columnId ? Number(req.params.columnId) : null;
+
     if (workspaceId) {
       return this.accessService.hasWorkspaceRole(userId, workspaceId, roles);
     }
 
     if (boardId) {
       return this.accessService.hasBoardAccess(userId, boardId, roles);
+    }
+
+    if (columnId) {
+      return this.accessService.hasColumnAccess(userId, columnId, roles);
     }
 
     throw new ForbiddenException('Access denied');

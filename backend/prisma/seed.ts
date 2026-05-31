@@ -18,7 +18,7 @@ async function main() {
     await tx.board.deleteMany();
     await tx.workspaceMember.deleteMany();
     await tx.workspace.deleteMany();
-    await tx.tag.deleteMany();
+    await tx.workspaceTag.deleteMany();
     await tx.workspaceRole.deleteMany();
     await tx.user.deleteMany();
 
@@ -192,10 +192,55 @@ async function main() {
     ]);
 
     const [bugTag, featureTag, designTag, urgentTag] = await Promise.all([
-      tx.tag.create({ data: { name: 'bug' } }),
-      tx.tag.create({ data: { name: 'feature' } }),
-      tx.tag.create({ data: { name: 'design' } }),
-      tx.tag.create({ data: { name: 'urgent' } }),
+      tx.workspaceTag.create({
+        data: {
+          name: 'bug',
+          color: '#e74c3c',
+          workspaceId: productWorkspace.id,
+        },
+      }),
+      tx.workspaceTag.create({
+        data: {
+          name: 'feature',
+          color: '#3498db',
+          workspaceId: productWorkspace.id,
+        },
+      }),
+      tx.workspaceTag.create({
+        data: {
+          name: 'design',
+          color: '#9b59b6',
+          workspaceId: productWorkspace.id,
+        },
+      }),
+      tx.workspaceTag.create({
+        data: {
+          name: 'urgent',
+          color: '#e67e22',
+          workspaceId: productWorkspace.id,
+        },
+      }),
+      tx.workspaceTag.create({
+        data: {
+          name: 'bug',
+          color: '#e74c3c',
+          workspaceId: marketingWorkspace.id,
+        },
+      }),
+      tx.workspaceTag.create({
+        data: {
+          name: 'feature',
+          color: '#3498db',
+          workspaceId: marketingWorkspace.id,
+        },
+      }),
+      tx.workspaceTag.create({
+        data: {
+          name: 'design',
+          color: '#9b59b6',
+          workspaceId: marketingWorkspace.id,
+        },
+      }),
     ]);
 
     await Promise.all([
