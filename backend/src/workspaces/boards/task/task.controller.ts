@@ -10,8 +10,6 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { TaskService } from './task.service';
-import { WorkspacesTokens } from 'src/workspaces/workspaces.tokens';
 import { CreateTaskDTO } from './dtos/create-task.dto';
 import { GetUser } from 'src/shared/prisma/decorators/get-user-id.decorator';
 import {
@@ -19,13 +17,15 @@ import {
   WorkspaceRole,
 } from 'src/workspaces/workspace/decorators/workspace-role.decorator';
 import { WorkspaceRoleGuard } from 'src/workspaces/workspace/guards/workspace-role.guards';
+import { TaskTokens } from './task.tokens';
+import type { CreateTaskUseCaseInterface } from './use-cases/create-task.use-case';
 
 @Controller('/columns/:columnId')
 @UseGuards(WorkspaceRoleGuard)
 export class TaskController {
   constructor(
-    @Inject(WorkspacesTokens.TaskService)
-    private readonly taskService: TaskService,
+    @Inject(TaskTokens.CreateTaskUseCase)
+    private readonly createTaskUseCase: CreateTaskUseCaseInterface,
   ) {}
 
   @Post('tasks')
@@ -36,7 +36,11 @@ export class TaskController {
     @Body() body: CreateTaskDTO,
     @GetUser('id') creatorId: string,
   ) {
-    const task = await this.taskService.createTask(creatorId, columnId, body);
+    const task = await this.createTaskUseCase.execute(
+      creatorId,
+      columnId,
+      body,
+    );
 
     return {
       message: 'Task created successfully.',

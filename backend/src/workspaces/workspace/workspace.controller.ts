@@ -5,6 +5,7 @@ import {
   Get,
   Inject,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   UseGuards,
@@ -60,7 +61,7 @@ export class WorkspaceController {
   @Delete('/workspaces/:workspaceId')
   async deleteWorkspace(
     @GetUser('id') userId: string,
-    @Param('workspaceId') workspaceId: number,
+    @Param('workspaceId', ParseIntPipe) workspaceId: number,
   ) {
     await this.workspaceService.deleteWorkspace(userId, workspaceId);
 
@@ -73,7 +74,7 @@ export class WorkspaceController {
   @Put('/workspaces/:workspaceId')
   async updateWorkspace(
     @GetUser('id') userId: string,
-    @Param('workspaceId') workspaceId: number,
+    @Param('workspaceId', ParseIntPipe) workspaceId: number,
     @Body() workspace: UpdateWorkspaceDTO,
   ) {
     const updatedWorkspace = await this.workspaceService.updateWorkspace(
