@@ -73,9 +73,14 @@ export class BoardController {
   @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
   async updateBoard(
     @Param('boardId', ParseIntPipe) boardId: number,
+    @Param('workspaceId', ParseIntPipe) workspaceId: number,
     @Body() body: UpdateBoardDTO,
   ) {
-    const updatedBoard = await this.boardService.updateBoard(boardId, body);
+    const updatedBoard = await this.boardService.updateBoard(
+      boardId,
+      workspaceId,
+      body,
+    );
 
     return {
       message: 'Board updated successfully',
@@ -85,8 +90,11 @@ export class BoardController {
 
   @Delete('boards/:boardId')
   @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
-  async deleteBoard(@Param('boardId', ParseIntPipe) boardId: number) {
-    await this.boardService.deleteBoard(boardId);
+  async deleteBoard(
+    @Param('boardId', ParseIntPipe) boardId: number,
+    @Param('workspaceId', ParseIntPipe) workspaceId: number,
+  ) {
+    await this.boardService.deleteBoard(boardId, workspaceId);
 
     return {
       message: 'Board deleted successfully',

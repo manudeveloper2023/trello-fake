@@ -1,16 +1,24 @@
 import { Module } from '@nestjs/common';
-import { TaskService } from './task.service';
 import { TaskController } from './task.controller';
 import { WorkspacesTokens } from 'src/workspaces/workspaces.tokens';
+import { CreateTaskUseCase } from './use-cases/create-task.use-case';
+import { TaskTokens } from './task.tokens';
+import { TaskRepository } from './repositories/task.repository';
+import { ColumnModule } from '../column/column.module';
 
 @Module({
+  imports: [ColumnModule],
   providers: [
     {
-      provide: WorkspacesTokens.TaskService,
-      useClass: TaskService,
+      provide: TaskTokens.CreateTaskUseCase,
+      useClass: CreateTaskUseCase,
+    },
+    {
+      provide: TaskTokens.TaskRepository,
+      useClass: TaskRepository,
     },
   ],
   controllers: [TaskController],
-  exports: [WorkspacesTokens.TaskService],
+  exports: [TaskTokens.CreateTaskUseCase, TaskTokens.TaskRepository],
 })
 export class TaskModule {}
