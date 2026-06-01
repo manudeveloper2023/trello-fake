@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { SharedTokens } from 'src/shared/shared.tokens';
+import { WorkspaceRole } from 'src/workspaces/workspace/decorators/workspace-role.decorator';
 
 export interface AccessRepositoryInterface {
   hasWorkspaceRole(
@@ -32,7 +33,7 @@ export class AccessRepository implements AccessRepositoryInterface {
     workspaceId: number,
     roles: string[],
   ): Promise<boolean> {
-    if (roles.includes('ALL')) {
+    if (roles.includes(WorkspaceRole.ALL)) {
       const membership = await this.prisma.workspaceMember.findFirst({
         where: {
           userId,
@@ -65,7 +66,7 @@ export class AccessRepository implements AccessRepositoryInterface {
     columnId: number,
     roles: string[],
   ): Promise<boolean> {
-    if (roles.includes('ALL')) {
+    if (roles.includes(WorkspaceRole.ALL)) {
       const columnMembership = await this.prisma.workspaceMember.findFirst({
         where: {
           userId,
@@ -112,7 +113,7 @@ export class AccessRepository implements AccessRepositoryInterface {
     boardId: number,
     roles: string[],
   ): Promise<boolean> {
-    if (roles.includes('ALL')) {
+    if (roles.includes(WorkspaceRole.ALL)) {
       const boardMembership = await this.prisma.workspaceMember.findFirst({
         where: {
           userId,
