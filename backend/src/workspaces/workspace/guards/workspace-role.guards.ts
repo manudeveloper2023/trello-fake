@@ -6,14 +6,14 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { SharedTokens } from 'src/shared/shared.tokens';
 import { ROLES_KEY } from '../decorators/workspace-role.decorator';
 import { AccessService } from 'src/shared/roles/services/access.service';
+import { AccessTokens } from 'src/shared/roles/access.tokens';
 
 @Injectable()
 export class WorkspaceRoleGuard implements CanActivate {
   constructor(
-    @Inject(SharedTokens.AccessService)
+    @Inject(AccessTokens.AccessService)
     private readonly accessService: AccessService,
     private readonly reflector: Reflector,
   ) {}

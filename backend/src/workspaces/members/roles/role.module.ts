@@ -1,15 +1,20 @@
 import { Module } from '@nestjs/common';
 import { RoleService } from './role.service';
-import { WorkspacesTokens } from 'src/workspaces/workspaces.tokens';
+import { RoleTokens } from './role.tokens';
+import { RoleRepository } from './repositories/role.repository';
 
 @Module({
   providers: [
     {
-      provide: WorkspacesTokens.MemberRoleService,
+      provide: RoleTokens.MemberRoleService,
       useClass: RoleService,
+    },
+    {
+      provide: RoleTokens.MemberRoleRepository,
+      useClass: RoleRepository,
     },
   ],
   controllers: [],
-  exports: [WorkspacesTokens.MemberRoleService],
+  exports: [RoleTokens.MemberRoleService, RoleTokens.MemberRoleRepository],
 })
 export class RoleModule {}
