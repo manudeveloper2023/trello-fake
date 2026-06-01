@@ -250,7 +250,7 @@ async function main() {
           description:
             'El acceso debe renovarse sin perder la sesión del usuario.',
           completed: false,
-          position: 1,
+          position: 1000,
           creatorId: ana.id,
           assignedToId: bruno.id,
           columnId: todoColumn.id,
@@ -266,7 +266,7 @@ async function main() {
           description:
             'Agregar placeholders claros cuando una columna no tiene tareas.',
           completed: false,
-          position: 2,
+          position: 2000,
           creatorId: ana.id,
           assignedToId: carla.id,
           columnId: doingColumn.id,
@@ -282,7 +282,7 @@ async function main() {
           description:
             'Mover tareas terminadas y revisar pendientes del equipo.',
           completed: true,
-          position: 3,
+          position: 3000,
           creatorId: bruno.id,
           assignedToId: ana.id,
           columnId: doneColumn.id,
@@ -298,7 +298,7 @@ async function main() {
           description:
             'Crear copies, creatividades y calendario de publicación.',
           completed: false,
-          position: 1,
+          position: 1000,
           creatorId: bruno.id,
           assignedToId: carla.id,
           columnId: marketingTodo.id,
@@ -314,7 +314,7 @@ async function main() {
           description:
             'Subir el anuncio final a las redes y monitorear resultados iniciales.',
           completed: true,
-          position: 2,
+          position: 2000,
           creatorId: carla.id,
           assignedToId: null,
           columnId: marketingDone.id,

@@ -18,9 +18,6 @@ export class CreateTaskDTO {
   @IsString({ message: 'Task description must be a string' })
   description?: string;
 
-  @IsInt({ message: 'Task position must be an integer' })
-  position!: number;
-
   @IsOptional()
   @IsString({ message: 'Assigned user ID must be a string' })
   assignedToId?: string;

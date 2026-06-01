@@ -29,7 +29,6 @@ export class ColumnController {
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async getColumnsForBoard(@Param('boardId') boardId: number) {
     const columns = await this.columnService.allColumnsForBoard(boardId);
-
     if (columns.length === 0) {
       return {
         message: 'No columns found for this board',

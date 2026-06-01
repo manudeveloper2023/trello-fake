@@ -10,7 +10,6 @@ export class TaskMapper {
       description: task.description || undefined,
       completed: task.completed,
       position: task.position,
-
       assignedTo: task.assignedTo
         ? {
             id: task.assignedTo.id,

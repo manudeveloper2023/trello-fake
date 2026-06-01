@@ -128,7 +128,7 @@ model Task {
   description String?
   completed   Boolean  @default(false)
 
-  position Int
+  position Decimal @db.Decimal(20,10)
 
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

@@ -35,6 +35,9 @@ export class ColumnRepository implements ColumnRepositoryInterface {
       where: {
         boardId: Number(boardId),
       },
+      include: {
+        tasks: true,
+      },
     });
   }
 

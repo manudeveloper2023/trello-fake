@@ -8,8 +8,9 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
+import { Decimal } from 'src/generated/prisma/internal/prismaNamespace';
 
-export class UpdateTaskDto {
+export class UpdateTaskDTO {
   @IsOptional()
   @IsString({ message: 'Task title must be a string' })
   @MinLength(3, { message: 'Task title must be at least 3 characters long' })
@@ -17,12 +18,16 @@ export class UpdateTaskDto {
   title?: string;
 
   @IsOptional()
+  @IsString({ message: 'Task description must be a string' })
+  description?: string;
+
+  @IsOptional()
   @IsBoolean({ message: 'Completed must be a boolean' })
   completed?: boolean;
 
   @IsOptional()
   @IsInt({ message: 'Task position must be an integer' })
-  position?: number;
+  position?: Decimal;
 
   @IsOptional()
   @IsString({ message: 'Assigned user ID must be a string' })
