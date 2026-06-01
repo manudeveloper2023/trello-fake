@@ -1,40 +1,36 @@
 import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { LoginRegisterDTO, UserRegisterDTO } from '../dtos/user';
 import { JwtService } from '@nestjs/jwt';
 import bcrypt from 'bcrypt';
 import { UserService } from 'src/identity/users/user.service';
-import { SharedTokens } from 'src/shared/shared.tokens';
 import { IdentityTokens } from 'src/identity/identity.tokens';
+import { AuthTokens } from '../auth.tokens';
+import type { AuthRepositoryInterface } from '../repositories/auth.repository';
 
 @Injectable({})
 export class AuthService {
   constructor(
-    @Inject(SharedTokens.PrismaService)
-    private readonly prisma: PrismaService,
+    @Inject(AuthTokens.AuthRepository)
+    private readonly authRepository: AuthRepositoryInterface,
     private readonly jwtService: JwtService,
     @Inject(IdentityTokens.UserService)
     private readonly userService: UserService,
   ) {}
   async register(user: UserRegisterDTO) {
-    const existingUser = await this.prisma.user.findFirst({
-      where: {
-        OR: [{ email: user.email }, { username: user.username }],
-      },
-    });
+    const existingUser = await this.authRepository.findByEmailOrUsername(
+      user.email,
+      user.username,
+    );
 
     if (existingUser) {
       throw new Error('User with the same email or username already exists.');
     }
 
     const hashedPassword = await bcrypt.hash(user.password, 10);
-    const createdUser = await this.prisma.user.create({
-      data: {
-        email: user.email,
-        username: user.username,
-        password: hashedPassword,
-      },
-    });
+    const createdUser = await this.authRepository.createUser(
+      user,
+      hashedPassword,
+    );
 
     const payload = { sub: createdUser.id, email: createdUser.email };
     const token = this.jwtService.sign(payload);

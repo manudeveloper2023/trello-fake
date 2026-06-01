@@ -1,15 +1,20 @@
 import { Global, Module } from '@nestjs/common';
-import { SharedTokens } from '../shared.tokens';
+import { AccessTokens } from './access.tokens';
 import { AccessService } from './services/access.service';
+import { AccessRepository } from './repositories/access.repository';
 
 @Global()
 @Module({
   providers: [
     {
-      provide: SharedTokens.AccessService,
+      provide: AccessTokens.AccessService,
       useClass: AccessService,
     },
+    {
+      provide: AccessTokens.AccessRepository,
+      useClass: AccessRepository,
+    },
   ],
-  exports: [SharedTokens.AccessService],
+  exports: [AccessTokens.AccessService, AccessTokens.AccessRepository],
 })
 export class SharedRoleModule {}

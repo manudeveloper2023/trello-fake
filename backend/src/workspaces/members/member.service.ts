@@ -1,11 +1,7 @@
 import { ConflictException, Inject, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/shared/prisma/prisma.service';
-import { SharedTokens } from 'src/shared/shared.tokens';
-import {
-  Roles,
-  WorkspaceRole,
-} from '../workspace/decorators/workspace-role.decorator';
 import { AddMemberDTO } from './dtos/add-member.dto';
+import type { MemberRepositoryInterface } from './repositories/member.repository';
+import { MemberTokens } from './member.tokens';
 
 export interface MemberServiceInterface {
   findAllMembersForWorkspace(workspaceId: number): Promise<any[]>;
@@ -19,44 +15,19 @@ export interface MemberServiceInterface {
 @Injectable({})
 export class MemberService implements MemberServiceInterface {
   constructor(
-    @Inject(SharedTokens.PrismaService)
-    private readonly prismaService: PrismaService,
+    @Inject(MemberTokens.MemberRepository)
+    private readonly memberRepository: MemberRepositoryInterface,
   ) {}
 
   async findAllMembersForWorkspace(workspaceId: number): Promise<any[]> {
-    const members = await this.prismaService.workspaceMember.findMany({
-      where: {
-        workspaceId: Number(workspaceId),
-      },
-      select: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-          },
-        },
-        role: {
-          select: {
-            name: true,
-          },
-        },
-        joinedAt: true,
-      },
-    });
-    return members;
+    return await this.memberRepository.findAllMembersForWorkspace(workspaceId);
   }
 
   async deleteMemberFromWorkspace(
     workspaceId: number,
     userId: string,
   ): Promise<void> {
-    await this.prismaService.workspaceMember.deleteMany({
-      where: {
-        workspaceId: Number(workspaceId),
-        userId: userId,
-      },
-    });
+    await this.memberRepository.deleteMemberFromWorkspace(workspaceId, userId);
   }
 
   async addMemberToWorkspace(
@@ -64,40 +35,19 @@ export class MemberService implements MemberServiceInterface {
     userId: string,
     body: AddMemberDTO,
   ): Promise<any> {
-    const existingMember = await this.prismaService.workspaceMember.findFirst({
-      where: {
-        userId: userId,
-        workspaceId: Number(workspaceId),
-      },
-    });
+    const existingMember = await this.memberRepository.findMemberInWorkspace(
+      workspaceId,
+      userId,
+    );
 
     if (existingMember) {
       throw new ConflictException('User is already a member of this workspace');
     }
 
-    const member = await this.prismaService.workspaceMember.create({
-      data: {
-        userId: userId,
-        workspaceId: Number(workspaceId),
-        roleId: body.roleId,
-      },
-      select: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
-          },
-        },
-        role: {
-          select: {
-            name: true,
-          },
-        },
-        joinedAt: true,
-      },
-    });
-
-    return member;
+    return await this.memberRepository.addMemberToWorkspace(
+      workspaceId,
+      userId,
+      body,
+    );
   }
 }

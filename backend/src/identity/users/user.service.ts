@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { User } from './models/user';
-import { PrismaService } from 'src/shared/prisma/prisma.service';
-import { SharedTokens } from 'src/shared/shared.tokens';
+import { IdentityTokens } from '../identity.tokens';
+import type { UserRepositoryInterface } from './repositories/user.repository';
 
 export interface UserServiceInterface {
   findUserByEmail(email: string): Promise<User | null>;
@@ -10,15 +10,11 @@ export interface UserServiceInterface {
 @Injectable({})
 export class UserService implements UserServiceInterface {
   constructor(
-    @Inject(SharedTokens.PrismaService)
-    private readonly prisma: PrismaService,
+    @Inject(IdentityTokens.UserRepository)
+    private readonly userRepository: UserRepositoryInterface,
   ) {}
 
   async findUserByEmail(email: string): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: { email },
-    });
-
-    return user;
+    return await this.userRepository.findUserByEmail(email);
   }
 }
