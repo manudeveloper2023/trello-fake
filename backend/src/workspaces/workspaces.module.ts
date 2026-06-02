@@ -5,6 +5,7 @@ import { ColumnModule } from './boards/column/column.module';
 import { TaskModule } from './boards/task/task.module';
 import { MemberModule } from './members/member.module';
 import { RoleModule } from './members/roles/role.module';
+import { TagModule } from './boards/task/tags/tag.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { RoleModule } from './members/roles/role.module';
     TaskModule,
     MemberModule,
     RoleModule,
+    TagModule,
   ],
   exports: [
     WorkspaceModule,
@@ -22,6 +24,7 @@ import { RoleModule } from './members/roles/role.module';
     TaskModule,
     MemberModule,
     RoleModule,
+    TagModule,
   ],
 })
 export class WorkspacesModule {}

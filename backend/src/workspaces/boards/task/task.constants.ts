@@ -15,6 +15,13 @@ export const taskInclude = {
       email: true,
     },
   },
+  board: {
+    select: {
+      id: true,
+      name: true,
+      workspaceId: true,
+    },
+  },
   parentTask: {
     select: {
       id: true,

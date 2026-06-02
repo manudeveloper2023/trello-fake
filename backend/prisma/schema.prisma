@@ -183,5 +183,5 @@ model WorkspaceTag {
   workspaceId Int
   workspace Workspace @relation(fields: [workspaceId], references: [id])
 
-  @@map("workspace_tagw")
+  @@map("workspace_tag")
 }
