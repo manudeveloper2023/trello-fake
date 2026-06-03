@@ -12,7 +12,8 @@ export interface TagRepositoryInterface {
   addTagsToTask(taskId: number, tagIds: number[]): Promise<void>;
   removeTagsFromTask(taskId: number, tagIds: number[]): Promise<void>;
   findTagsByIds(tagIds: number[]): Promise<WorkspaceTag[] | null>;
-  allTasksForWorkspace(workspaceId: number): Promise<WorkspaceTag[]>;
+  allTagsForWorkspace(workspaceId: number): Promise<WorkspaceTag[]>;
+  allTagsForTask(taskId: number): Promise<WorkspaceTag[]>;
 }
 @Injectable()
 export class TagRepository implements TagRepositoryInterface {
@@ -20,9 +21,12 @@ export class TagRepository implements TagRepositoryInterface {
     @Inject(SharedTokens.PrismaService)
     private readonly prisma: PrismaService,
   ) {}
-  allTasksForWorkspace(workspaceId: number): Promise<WorkspaceTag[]> {
+  allTagsForWorkspace(workspaceId: number): Promise<WorkspaceTag[]> {
     return this.prisma.workspaceTag.findMany({
       where: { workspaceId },
+      include: {
+        tasks: true,
+      },
     });
   }
 
@@ -35,6 +39,19 @@ export class TagRepository implements TagRepositoryInterface {
         },
       },
     });
+  }
+
+  async allTagsForTask(taskId: number): Promise<WorkspaceTag[]> {
+    const tags = await this.prisma.workspaceTag.findMany({
+      where: {
+        tasks: {
+          some: {
+            id: taskId,
+          },
+        },
+      },
+    });
+    return tags;
   }
 
   async findTagsByIds(tagIds: number[]): Promise<WorkspaceTag[] | null> {

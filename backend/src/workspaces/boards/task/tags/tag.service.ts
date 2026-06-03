@@ -15,8 +15,12 @@ import type { TaskRepositoryInterface } from '../repositories/task.repository';
 export interface TagServiceInterface {
   allTagsForWorkspace(workspaceId: number): Promise<ReadTagDTO[]>;
   createTag(body: CreateTagDTO, workspaceId: number): Promise<ReadTagDTO>;
-  updateTag(tagId: number, body: UpdateTagDTO): Promise<ReadTagDTO>;
-  deleteTag(tagId: number): Promise<void>;
+  updateTag(
+    tagId: number,
+    workspaceId: number,
+    body: UpdateTagDTO,
+  ): Promise<ReadTagDTO>;
+  deleteTag(tagId: number, workspaceId: number): Promise<void>;
   addTagsToTask(taskId: number, tagIds: number[]): Promise<void>;
   removeTagsFromTask(taskId: number, tagIds: number[]): Promise<void>;
 }
@@ -35,6 +39,10 @@ export class TagService implements TagServiceInterface {
   ): Promise<ReadTagDTO> {
     const { taskId } = body;
     const task = taskId ? await this.taskRepository.findTaskById(taskId) : null;
+
+    if (body.name) {
+      await this.ensureTagNameIsUnique(workspaceId, body.name);
+    }
 
     if (taskId && !task) {
       throw new NotFoundException(`Task with ID ${taskId} not found`);
@@ -57,22 +65,34 @@ export class TagService implements TagServiceInterface {
     return newTag;
   }
 
-  async updateTag(tagId: number, body: UpdateTagDTO): Promise<ReadTagDTO> {
+  async updateTag(
+    tagId: number,
+    workspaceId: number,
+    body: UpdateTagDTO,
+  ): Promise<ReadTagDTO> {
+    if (body.name) {
+      await this.ensureTagNameIsUnique(workspaceId, body.name);
+    }
+
+    await this.ensureTagsBelongToWorkspace([tagId], workspaceId);
+
     const tag = await this.tagRepository.updateTag(tagId, body);
     const updatedTag: ReadTagDTO = {
       id: tag.id,
       name: tag.name,
       color: tag.color,
     };
+
     return updatedTag;
   }
 
-  async deleteTag(tagId: number): Promise<void> {
+  async deleteTag(tagId: number, workspaceId: number): Promise<void> {
+    await this.ensureTagsBelongToWorkspace([tagId], workspaceId);
     await this.tagRepository.deleteTag(tagId);
   }
 
   async allTagsForWorkspace(workspaceId: number): Promise<ReadTagDTO[]> {
-    const tags = await this.tagRepository.allTasksForWorkspace(workspaceId);
+    const tags = await this.tagRepository.allTagsForWorkspace(workspaceId);
     return tags.map((tag) => ({
       id: tag.id,
       name: tag.name,
@@ -88,8 +108,44 @@ export class TagService implements TagServiceInterface {
 
   async removeTagsFromTask(taskId: number, tagIds: number[]): Promise<void> {
     await this.ensureTagsBelongToTaskWorkspace(taskId, tagIds);
-
+    await this.ensureTagsBelongToTask(taskId, tagIds);
     await this.tagRepository.removeTagsFromTask(taskId, tagIds);
+  }
+
+  private async ensureTagsBelongToWorkspace(
+    tagIds: number[],
+    workspaceId: number,
+  ): Promise<void> {
+    const tags = await this.tagRepository.findTagsByIds(tagIds);
+
+    if (!tags || tags.length !== tagIds.length) {
+      throw new NotFoundException(`One or more tags not found`);
+    }
+
+    const allBelongToWorkspace = tags.every(
+      (tag) => tag.workspaceId === workspaceId,
+    );
+
+    if (!allBelongToWorkspace) {
+      throw new BadRequestException(
+        `One or more tags do not belong to the specified workspace`,
+      );
+    }
+  }
+
+  private async ensureTagsBelongToTask(
+    taskId: number,
+    tagIds: number[],
+  ): Promise<void> {
+    const tags = await this.tagRepository.allTagsForTask(taskId);
+
+    const allBelongToTask = tags.every((tag) => tagIds.includes(tag.id));
+
+    if (!allBelongToTask) {
+      throw new BadRequestException(
+        `One or more tags do not belong to the specified task`,
+      );
+    }
   }
 
   private async ensureTagsBelongToTaskWorkspace(
@@ -115,6 +171,23 @@ export class TagService implements TagServiceInterface {
     if (!existsInWorkspace) {
       throw new BadRequestException(
         `One or more tags do not belong to the same workspace as the task`,
+      );
+    }
+  }
+
+  private async ensureTagNameIsUnique(
+    workspaceId: number,
+    tagName: string,
+  ): Promise<void> {
+    const tags = await this.tagRepository.allTagsForWorkspace(workspaceId);
+
+    const nameExists = tags.some(
+      (tag) => tag.name.toLowerCase() === tagName.toLowerCase(),
+    );
+
+    if (nameExists) {
+      throw new BadRequestException(
+        `Tag with name ${tagName} already exists in this workspace`,
       );
     }
   }

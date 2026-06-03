@@ -3,6 +3,8 @@ import { Column } from 'src/generated/prisma/client';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 import { SharedTokens } from 'src/shared/shared.tokens';
 import { UpdateColumnDTO } from '../dtos/update-column.dto';
+import { ColumnWithRelations } from '../column.types';
+import { columnInclude } from '../column.constants';
 export interface ColumnRepositoryInterface {
   findByColumnId(columnId: number): Promise<Column | null>;
   updateColumn(
@@ -12,7 +14,7 @@ export interface ColumnRepositoryInterface {
   ): Promise<Column>;
   deleteColumn(columnId: number): Promise<void>;
   createColumn(name: string, boardId: number): Promise<Column>;
-  allColumnsForBoard(boardId: number): Promise<Column[]>;
+  allColumnsForBoard(boardId: number): Promise<ColumnWithRelations[]>;
 }
 
 @Injectable()
@@ -30,14 +32,12 @@ export class ColumnRepository implements ColumnRepositoryInterface {
     });
   }
 
-  async allColumnsForBoard(boardId: number): Promise<Column[]> {
+  async allColumnsForBoard(boardId: number): Promise<ColumnWithRelations[]> {
     return await this.prisma.column.findMany({
       where: {
         boardId: Number(boardId),
       },
-      include: {
-        tasks: true,
-      },
+      include: columnInclude,
     });
   }
 
