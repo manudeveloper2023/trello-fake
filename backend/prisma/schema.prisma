@@ -63,7 +63,7 @@ model WorkspaceMember {
   user User @relation(fields: [userId], references: [id] , name: "WorkspaceMembers")
 
   workspaceId Int
-  workspace Workspace @relation(fields: [workspaceId], references: [id] , name: "WorkspaceMembers")
+  workspace Workspace @relation(fields: [workspaceId], references: [id] , name: "WorkspaceMembers" , onDelete: Cascade)
 
   roleId Int
   role WorkspaceRole @relation(fields: [roleId], references: [id])
@@ -102,7 +102,7 @@ model Board {
   createdAt DateTime @default(now())
 
   workspaceId Int
-  workspace Workspace @relation(fields: [workspaceId],references: [id])
+  workspace Workspace @relation(fields: [workspaceId],references: [id] , onDelete: Cascade)
 
   columns Column[]
   tasks   Task[]
@@ -115,7 +115,7 @@ model Column {
   name     String
 
   boardId Int
-  board   Board @relation(fields: [boardId], references: [id])
+  board   Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
   
   tasks Task[]
 
@@ -151,7 +151,7 @@ model Task {
   // Desnormalization to optimize queries
 
   boardId Int
-  board   Board @relation(fields: [boardId], references: [id])
+  board   Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
 
   
   tags        WorkspaceTag[]   
@@ -181,7 +181,7 @@ model WorkspaceTag {
   tasks Task[] 
 
   workspaceId Int
-  workspace Workspace @relation(fields: [workspaceId], references: [id])
+  workspace Workspace @relation(fields: [workspaceId], references: [id] , onDelete: Cascade)
 
-  @@map("workspace_tag")
+  @@map("workspace_tags")
 }

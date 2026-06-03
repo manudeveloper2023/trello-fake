@@ -34,7 +34,7 @@ export interface TaskRepositoryInterface {
   ): Promise<TaskWithRelations | null>;
   allTasksForColumn(columnId: number): Promise<TaskWithRelations[]>;
 
-  lastTaskPositionInColumn(columnId: number): Promise<Task>;
+  lastTaskPositionInColumn(columnId: number): Promise<Task | null>;
 }
 
 @Injectable()
@@ -69,8 +69,8 @@ export class TaskRepository implements TaskRepositoryInterface {
     });
   }
 
-  lastTaskPositionInColumn(columnId: number): Promise<Task> {
-    return this.prisma.task.findFirstOrThrow({
+  lastTaskPositionInColumn(columnId: number): Promise<Task | null> {
+    return this.prisma.task.findFirst({
       where: {
         columnId: Number(columnId),
       },

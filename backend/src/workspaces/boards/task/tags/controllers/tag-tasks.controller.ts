@@ -18,7 +18,7 @@ export class TagTasksController {
     private readonly tagService: TagServiceInterface,
   ) {}
   @Post()
-  async addTagsToTask(
+  async addTagsFromTask(
     @Body() body: ModifyTagsToTaskDTO,
     @Param('taskId', ParseIntPipe) taskId: number,
   ) {
