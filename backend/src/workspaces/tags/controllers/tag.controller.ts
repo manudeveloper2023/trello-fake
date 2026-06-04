@@ -19,6 +19,7 @@ import {
   Roles,
   WorkspaceRole,
 } from 'src/workspaces/workspace/decorators/workspace-role.decorator';
+import { AccessResource } from 'src/workspaces/workspace/decorators/access-resource.decorator';
 
 @Controller('workspaces/:workspaceId')
 @UseGuards(WorkspaceRoleGuard)
@@ -30,6 +31,7 @@ export class TagController {
 
   @Get('tags')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
+  @AccessResource('workspace')
   async allTagsForWorkspace(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
   ) {
@@ -45,6 +47,7 @@ export class TagController {
   }
 
   @Post('tags')
+  @AccessResource('workspace')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async createTag(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
@@ -59,6 +62,7 @@ export class TagController {
   }
 
   @Patch('tags/:tagId')
+  @AccessResource('workspace')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async updateTag(
     @Param('tagId', ParseIntPipe) tagId: number,
@@ -78,6 +82,7 @@ export class TagController {
   }
 
   @Delete('tags/:tagId')
+  @AccessResource('workspace')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async deleteTag(
     @Param('tagId', ParseIntPipe) tagId: number,

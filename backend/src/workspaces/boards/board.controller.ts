@@ -20,6 +20,7 @@ import {
   WorkspaceRole,
 } from 'src/workspaces/workspace/decorators/workspace-role.decorator';
 import { WorkspaceRoleGuard } from 'src/workspaces/workspace/guards/workspace-role.guards';
+import { AccessResource } from '../workspace/decorators/access-resource.decorator';
 
 @Controller('workspaces/:workspaceId')
 @UseGuards(WorkspaceRoleGuard)
@@ -30,6 +31,7 @@ export class BoardController {
   ) {}
 
   @Get('boards')
+  @AccessResource('workspace')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async getBoardsForWorkspace(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
@@ -53,6 +55,7 @@ export class BoardController {
   }
 
   @Post('boards')
+  @AccessResource('workspace')
   @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
   async createBoard(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,
@@ -70,6 +73,7 @@ export class BoardController {
   }
 
   @Put('boards/:boardId')
+  @AccessResource('workspace')
   @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
   async updateBoard(
     @Param('boardId', ParseIntPipe) boardId: number,
@@ -89,6 +93,7 @@ export class BoardController {
   }
 
   @Delete('boards/:boardId')
+  @AccessResource('workspace')
   @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
   async deleteBoard(
     @Param('boardId', ParseIntPipe) boardId: number,

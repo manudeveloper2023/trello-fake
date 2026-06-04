@@ -17,6 +17,7 @@ import {
   WorkspaceRole,
 } from 'src/workspaces/workspace/decorators/workspace-role.decorator';
 import { CreateColumnDTO } from './dtos/create-column.dto';
+import { AccessResource } from '../workspace/decorators/access-resource.decorator';
 
 @Controller('/boards/:boardId/columns')
 @UseGuards(WorkspaceRoleGuard)
@@ -26,6 +27,7 @@ export class ColumnController {
     private readonly columnService: ColumnService,
   ) {}
   @Get()
+  @AccessResource('board')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async getColumnsForBoard(@Param('boardId') boardId: number) {
     const columns = await this.columnService.allColumnsForBoard(boardId);
@@ -42,6 +44,7 @@ export class ColumnController {
   }
 
   @Post()
+  @AccessResource('board')
   @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
   async createColumn(
     @Param('boardId') boardId: number,
@@ -59,6 +62,7 @@ export class ColumnController {
   }
 
   @Put(':columnId')
+  @AccessResource('board')
   @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
   async updateColumn(
     @Param('columnId') columnId: number,
@@ -78,6 +82,7 @@ export class ColumnController {
   }
 
   @Delete(':columnId')
+  @AccessResource('board')
   @Roles(WorkspaceRole.ADMIN, WorkspaceRole.OWNER)
   async deleteColumn(
     @Param('columnId') columnId: number,

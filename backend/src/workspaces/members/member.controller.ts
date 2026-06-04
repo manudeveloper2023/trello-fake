@@ -21,6 +21,7 @@ import {
   WorkspaceRole,
 } from '../workspace/decorators/workspace-role.decorator';
 import { WorkspaceRoleGuard } from '../workspace/guards/workspace-role.guards';
+import { AccessResource } from '../workspace/decorators/access-resource.decorator';
 
 @Controller('/workspaces/:workspaceId/members')
 @UseGuards(MemberHiearchyGuard, WorkspaceRoleGuard)
@@ -31,6 +32,7 @@ export class MemberController {
   ) {}
 
   @Get()
+  @AccessResource('workspace')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async findAllMembersForWorkspace(
     @Param('workspaceId', ParseIntPipe) workspaceId: number,

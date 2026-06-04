@@ -325,6 +325,61 @@ async function main() {
         },
       }),
     ]);
+
+    await Promise.all([
+      tx.block.create({
+        data: {
+          content: 'El login falla al intentar refrescar el token de acceso.',
+          position: 1000,
+          type: 'TEXT',
+          taskId: 1,
+        },
+      }),
+      tx.block.create({
+        data: {
+          content: 'Reproducir el error en ambiente de staging.',
+          position: 2000,
+          type: 'TEXT',
+          taskId: 1,
+        },
+      }),
+      tx.block.create({
+        data: {
+          content: 'Investigar posibles causas en el módulo de autenticación.',
+          position: 3000,
+          type: 'TEXT',
+          taskId: 1,
+        },
+      }),
+
+      tx.block.create({
+        data: {
+          content: 'Agregar un mensaje de error claro para el usuario.',
+          position: 4000,
+          type: 'TEXT',
+          taskId: 1,
+        },
+      }),
+
+      tx.block.create({
+        data: {
+          content:
+            'Definir un proceso de renovación de sesión sin interrupciones.',
+          position: 5000,
+          type: 'TEXT',
+          taskId: 1,
+        },
+      }),
+
+      tx.block.create({
+        data: {
+          content: 'Corregir el error y desplegar la solución a producción.',
+          position: 6000,
+          type: 'TEXT',
+          taskId: 1,
+        },
+      }),
+    ]);
   });
 
   console.log('Database seeded successfully');

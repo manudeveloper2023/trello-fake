@@ -17,6 +17,7 @@ import { UpdateWorkspaceDTO } from './dtos/workspace-update.dto';
 import { WorkspacesTokens } from '../workspaces.tokens';
 import { WorkspaceRoleGuard } from './guards/workspace-role.guards';
 import { Roles, WorkspaceRole } from './decorators/workspace-role.decorator';
+import { AccessResource } from './decorators/access-resource.decorator';
 
 @Controller({})
 @UseGuards(WorkspaceRoleGuard)
@@ -58,6 +59,7 @@ export class WorkspaceController {
   }
 
   @Roles(WorkspaceRole.OWNER)
+  @AccessResource('workspace')
   @Delete('/workspaces/:workspaceId')
   async deleteWorkspace(
     @GetUser('id') userId: string,
@@ -71,6 +73,7 @@ export class WorkspaceController {
   }
 
   @Roles(WorkspaceRole.OWNER)
+  @AccessResource('workspace')
   @Put('/workspaces/:workspaceId')
   async updateWorkspace(
     @GetUser('id') userId: string,
