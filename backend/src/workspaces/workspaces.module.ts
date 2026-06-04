@@ -6,6 +6,7 @@ import { TaskModule } from './tasks/task.module';
 import { MemberModule } from './members/member.module';
 import { RoleModule } from './members/roles/role.module';
 import { TagModule } from './tags/tag.module';
+import { BlockModule } from './blocks/block.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TagModule } from './tags/tag.module';
     MemberModule,
     RoleModule,
     TagModule,
+    BlockModule,
   ],
   exports: [
     WorkspaceModule,
@@ -25,6 +27,7 @@ import { TagModule } from './tags/tag.module';
     MemberModule,
     RoleModule,
     TagModule,
+    BlockModule,
   ],
 })
 export class WorkspacesModule {}

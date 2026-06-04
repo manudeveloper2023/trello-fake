@@ -1,6 +1,9 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { AccessTokens } from '../access.tokens';
-import type { AccessRepositoryInterface } from '../repositories/access.repository';
+import type {
+  AccessRepositoryInterface,
+  ResourceType,
+} from '../repositories/access.repository';
 
 @Injectable()
 export class AccessService {
@@ -9,19 +12,12 @@ export class AccessService {
     private readonly accessRepository: AccessRepositoryInterface,
   ) {}
 
-  async hasWorkspaceRole(userId: string, workspaceId: number, roles: string[]) {
-    return await this.accessRepository.hasWorkspaceRole(
-      userId,
-      workspaceId,
-      roles,
-    );
-  }
-
-  async hasColumnAccess(userId: string, columnId: number, roles: string[]) {
-    return await this.accessRepository.hasColumnAccess(userId, columnId, roles);
-  }
-
-  async hasBoardAccess(userId: string, boardId: number, roles: string[]) {
-    return await this.accessRepository.hasBoardAccess(userId, boardId, roles);
+  async hasAccess(
+    resource: ResourceType,
+    userId: string,
+    resourceId: number,
+    roles: string[],
+  ) {
+    return this.accessRepository.hasAccess(resource, userId, resourceId, roles);
   }
 }

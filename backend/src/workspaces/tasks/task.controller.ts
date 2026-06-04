@@ -26,6 +26,7 @@ import type { DeleteTaskUseCaseInterface } from './use-cases/delete-task.use-cas
 import { UpdateTaskDTO } from './dtos/update-task.dto';
 import type { MoveTaskUseCaseInterface } from './use-cases/move-task.use-case';
 import { MoveTaskDTO } from './dtos/move-task.dto';
+import { AccessResource } from '../workspace/decorators/access-resource.decorator';
 
 @Controller('/columns/:columnId')
 @UseGuards(WorkspaceRoleGuard)
@@ -43,6 +44,7 @@ export class TaskController {
 
   @Post('tasks')
   @HttpCode(201)
+  @AccessResource('column')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async createTask(
     @Param('columnId', ParseIntPipe) columnId: number,
@@ -62,6 +64,7 @@ export class TaskController {
   }
 
   @Put('tasks/:taskId')
+  @AccessResource('column')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async updateTask(
     @Param('columnId', ParseIntPipe) columnId: number,
@@ -81,6 +84,7 @@ export class TaskController {
   }
 
   @Delete('tasks/:taskId')
+  @AccessResource('column')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async deleteTask(
     @Param('columnId', ParseIntPipe) columnId: number,
@@ -97,6 +101,7 @@ export class TaskController {
   }
 
   @Patch('tasks/:taskId/move')
+  @AccessResource('column')
   @Roles(WorkspaceRole.OWNER, WorkspaceRole.ADMIN, WorkspaceRole.MEMBER)
   async moveTask(
     @Param('columnId', ParseIntPipe) destinationColumnId: number,

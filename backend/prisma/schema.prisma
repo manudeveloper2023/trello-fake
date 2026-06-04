@@ -146,8 +146,8 @@ model Task {
 
 
   columnId Int
-  column   Column @relation(fields: [columnId], references: [id])
-
+  column   Column @relation(fields: [columnId], references: [id] , onDelete: Cascade)
+  
   // Desnormalization to optimize queries
 
   boardId Int
