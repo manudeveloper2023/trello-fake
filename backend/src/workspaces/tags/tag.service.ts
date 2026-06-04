@@ -9,8 +9,8 @@ import { TagTokens } from './tag.tokens';
 import { CreateTagDTO } from './dtos/create-tag.dto';
 import { UpdateTagDTO } from './dtos/update-tag.dto';
 import { ReadTagDTO } from './dtos/read-tag.dto';
-import { TaskTokens } from '../task.tokens';
-import type { TaskRepositoryInterface } from '../repositories/task.repository';
+import { TaskTokens } from '../tasks/task.tokens';
+import type { TaskRepositoryInterface } from '../tasks/repositories/task.repository';
 
 export interface TagServiceInterface {
   allTagsForWorkspace(workspaceId: number): Promise<ReadTagDTO[]>;

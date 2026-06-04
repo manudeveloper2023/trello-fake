@@ -3,8 +3,8 @@ import { CreateTaskDTO } from '../dtos/create-task.dto';
 import { ReadTaskDTO } from '../dtos/read-task.dto';
 import type { TaskRepositoryInterface } from '../repositories/task.repository';
 import { TaskTokens } from '../task.tokens';
-import type { ColumnRepositoryInterface } from '../../column/repositories/column.repository';
-import { ColumnTokens } from '../../column/column.tokens';
+import type { ColumnRepositoryInterface } from '../../columns/repositories/column.repository';
+import { ColumnTokens } from '../../columns/column.tokens';
 import { TaskMapper } from '../mappers/task.mapper';
 import { Decimal } from 'src/generated/prisma/internal/prismaNamespace';
 

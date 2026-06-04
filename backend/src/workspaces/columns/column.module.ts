@@ -4,7 +4,7 @@ import { ColumnService } from './column.service';
 import { ColumnController } from './column.controller';
 import { ColumnRepository } from './repositories/column.repository';
 import { ColumnTokens } from './column.tokens';
-import { BoardModule } from '../board/board.module';
+import { BoardModule } from '../boards/board.module';
 
 @Module({
   imports: [BoardModule],

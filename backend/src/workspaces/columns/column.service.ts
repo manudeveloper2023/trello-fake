@@ -10,8 +10,8 @@ import { UpdateColumnDTO } from './dtos/update-column.dto';
 import { ReadColumnDTO } from './dtos/read-column.dto';
 import { ColumnTokens } from './column.tokens';
 import type { ColumnRepositoryInterface } from './repositories/column.repository';
-import type { BoardRepositoryInterface } from '../board/repositories/board.repository';
-import { BoardTokens } from '../board/board.tokens';
+import type { BoardRepositoryInterface } from '../boards/repositories/board.repository';
+import { BoardTokens } from '../boards/board.tokens';
 
 export interface ColumnServiceInterface {
   allColumnsForBoard(boardId: number): Promise<ReadColumnDTO[]>;

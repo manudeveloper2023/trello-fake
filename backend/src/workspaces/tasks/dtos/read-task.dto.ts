@@ -1,5 +1,5 @@
 import { Decimal } from 'src/generated/prisma/internal/prismaNamespace';
-import { ReadColumnDTO } from '../../column/dtos/read-column.dto';
+import { ReadColumnDTO } from '../../columns/dtos/read-column.dto';
 
 export interface ReadTaskDTO {
   id: number;
