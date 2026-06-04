@@ -8,8 +8,8 @@ import type { TaskRepositoryInterface } from '../repositories/task.repository';
 import { MoveTaskDTO } from '../dtos/move-task.dto';
 import { Decimal } from 'src/generated/prisma/internal/prismaNamespace';
 import { TaskTokens } from '../task.tokens';
-import { ColumnTokens } from '../../column/column.tokens';
-import type { ColumnRepositoryInterface } from '../../column/repositories/column.repository';
+import { ColumnTokens } from '../../columns/column.tokens';
+import type { ColumnRepositoryInterface } from '../../columns/repositories/column.repository';
 
 export interface MoveTaskUseCaseInterface {
   execute(

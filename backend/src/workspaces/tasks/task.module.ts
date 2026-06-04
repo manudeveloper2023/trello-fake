@@ -3,7 +3,7 @@ import { TaskController } from './task.controller';
 import { CreateTaskUseCase } from './use-cases/create-task.use-case';
 import { TaskTokens } from './task.tokens';
 import { TaskRepository } from './repositories/task.repository';
-import { ColumnModule } from '../column/column.module';
+import { ColumnModule } from '../columns/column.module';
 import { DeleteTaskUseCase } from './use-cases/delete-task.use-case';
 import { UpdateTaskUseCase } from './use-cases/update-task.use-case';
 import { MoveTaskUseCase } from './use-cases/move-task.use-case';

@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { WorkspaceModule } from './workspace/workspace.module';
-import { BoardModule } from './boards/board/board.module';
-import { ColumnModule } from './boards/column/column.module';
-import { TaskModule } from './boards/task/task.module';
+import { BoardModule } from './boards/board.module';
+import { ColumnModule } from './columns/column.module';
+import { TaskModule } from './tasks/task.module';
 import { MemberModule } from './members/member.module';
 import { RoleModule } from './members/roles/role.module';
-import { TagModule } from './boards/task/tags/tag.module';
+import { TagModule } from './tags/tag.module';
 
 @Module({
   imports: [
