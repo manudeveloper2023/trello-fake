@@ -14,6 +14,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { UserThrottlerGuard } from './shared/throttlers/guards/user-throttler.guard';
 import { ThrottlerExceptionFilter } from './shared/throttlers/filters/throttler-exception.filter';
+import { StorageModule } from './shared/storage/storage.module';
 
 @Module({
   imports: [
@@ -29,16 +30,17 @@ import { ThrottlerExceptionFilter } from './shared/throttlers/filters/throttler-
         },
       ],
     }),
-    PrismaModule,
-    SharedRoleModule,
-    UserModule,
-    WorkspacesModule,
     JwtModule.registerAsync({
       global: true,
       imports: [ConfigModule],
       useFactory: jwtConfig,
       inject: [ConfigService],
     }),
+    PrismaModule,
+    SharedRoleModule,
+    UserModule,
+    WorkspacesModule,
+    StorageModule,
     AuthModule,
   ],
   controllers: [AppController],
