@@ -108,11 +108,6 @@ export class TaskController {
     @Param('taskId', ParseIntPipe) taskId: number,
     @Body() body: MoveTaskDTO,
   ) {
-    console.log('Received move task request:', {
-      taskId,
-      destinationColumnId,
-      body,
-    });
     await this.moveTaskUseCase.execute(taskId, destinationColumnId, body);
 
     return {
