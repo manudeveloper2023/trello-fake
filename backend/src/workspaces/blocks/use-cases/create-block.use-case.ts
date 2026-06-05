@@ -3,8 +3,9 @@ import { BlockTokens } from '../block.tokens';
 import { CreateBlockDTO } from '../dtos/create-block.dto';
 import type { BlockRepositoryInterface } from '../repositories/block.repository';
 import { ReadBlockDTO } from '../dtos/read-block.dto';
-import { Decimal } from 'src/generated/prisma/internal/prismaNamespaceBrowser';
-
+import { BlockPositionService } from '../services/block-position.service';
+import { BlockMapper } from '../mappers/block.mapper';
+import { Decimal } from 'src/generated/prisma/internal/prismaNamespace';
 export interface CreateBlockUseCaseInterface {
   execute(taskId: number, body: CreateBlockDTO): Promise<ReadBlockDTO>;
 }
@@ -12,14 +13,21 @@ export interface CreateBlockUseCaseInterface {
 @Injectable()
 export class CreateBlockUseCase implements CreateBlockUseCaseInterface {
   constructor(
+    @Inject(BlockTokens.BlockPositionService)
+    private readonly blockPositionService: BlockPositionService,
     @Inject(BlockTokens.BlockRepository)
     private readonly blockRepository: BlockRepositoryInterface,
   ) {}
   async execute(taskId: number, body: CreateBlockDTO): Promise<ReadBlockDTO> {
-    const lastBlock = await this.blockRepository.getLastBlockForTask(taskId);
-    const newPosition = lastBlock
-      ? lastBlock.position.add(1000)
-      : new Decimal(1000);
+    const { beforeBlockId, afterBlockId } = body;
+
+    const newPosition = await this.blockPositionService.calculateCreatePosition(
+      taskId,
+      {
+        beforeBlockId,
+        afterBlockId,
+      },
+    );
 
     const block = await this.blockRepository.createBlock(
       taskId,
@@ -27,12 +35,7 @@ export class CreateBlockUseCase implements CreateBlockUseCaseInterface {
       newPosition,
     );
 
-    const readBlockDTO: ReadBlockDTO = {
-      id: block.id,
-      content: block.content,
-      position: block.position,
-      type: block.type,
-    };
+    const readBlockDTO: ReadBlockDTO = BlockMapper.toDTO(block);
 
     return readBlockDTO;
   }

@@ -7,6 +7,7 @@ import { MoveBlockUseCase } from './use-cases/move-block.use-case';
 import { UpdateBlockUseCase } from './use-cases/update-block.use-case';
 import { DeleteBlockUseCase } from './use-cases/delete-block.use-case';
 import { AllBlocksForTaskUseCase } from './use-cases/all-blocks-for-task.use-case';
+import { BlockPositionService } from './services/block-position.service';
 
 @Module({
   providers: [
@@ -33,6 +34,10 @@ import { AllBlocksForTaskUseCase } from './use-cases/all-blocks-for-task.use-cas
     {
       provide: BlockTokens.MoveBlockUseCase,
       useClass: MoveBlockUseCase,
+    },
+    {
+      provide: BlockTokens.BlockPositionService,
+      useClass: BlockPositionService,
     },
   ],
   controllers: [BlockController],
