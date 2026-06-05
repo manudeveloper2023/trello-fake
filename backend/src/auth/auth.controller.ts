@@ -12,6 +12,7 @@ import { AuthService } from './services/auth.service';
 import { Public } from './decorators/public.decorator';
 import type { Response } from 'express';
 import { AuthTokens } from './auth.tokens';
+import { Throttle } from '@nestjs/throttler';
 
 @Controller('auth')
 export class AuthController {
@@ -22,6 +23,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.CREATED)
   @Post('register')
+  @Throttle({ default: { limit: 3, ttl: 60000 } }) // 3 requests per minute per IP address
   @Public()
   async register(
     @Body() dto: UserRegisterDTO,
@@ -35,12 +37,17 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
-    return authUser;
+    return {
+      message: 'User registered successfully.',
+    };
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
+  // 5 requests per minute per IP address
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Public()
   async login(
     @Body() dto: LoginRegisterDTO,
@@ -55,9 +62,12 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
 
-    return authUser;
+    return {
+      message: 'User logged in successfully.',
+    };
   }
 
   @HttpCode(HttpStatus.OK)
@@ -68,6 +78,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
+      maxAge: 60 * 60 * 1000, // 1 hour
     });
     return { message: 'Logged out successfully.' };
   }
