@@ -9,7 +9,7 @@ export class ThrottlerExceptionFilter implements ExceptionFilter {
     const req = host.switchToHttp().getRequest();
 
     this.logger.warn(
-      `Throttling limit exceeded for IP: ${req.ip}, URL: ${req.url}`,
+      `Rate limit exceeded | ${req.method} ${req.url} | ip=${req.ip} | user=${req.user?.id ?? 'anon'}`,
     );
 
     const response = host.switchToHttp().getResponse();
