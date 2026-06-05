@@ -5,4 +5,5 @@ export enum BlockTokens {
   UpdateBlockUseCase = 'UpdateBlockUseCase',
   MoveBlockUseCase = 'MoveBlockUseCase',
   AllBlocksForTaskUseCase = 'AllBlocksForTaskUseCase',
+  BlockPositionService = 'BlockPositionService',
 }
