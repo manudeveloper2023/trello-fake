@@ -6,4 +6,5 @@ export enum BlockTokens {
   MoveBlockUseCase = 'MoveBlockUseCase',
   AllBlocksForTaskUseCase = 'AllBlocksForTaskUseCase',
   BlockPositionService = 'BlockPositionService',
+  AttachImageBlockUseCase = 'AttachImageBlockUseCase',
 }

@@ -8,6 +8,7 @@ import { UpdateBlockUseCase } from './use-cases/update-block.use-case';
 import { DeleteBlockUseCase } from './use-cases/delete-block.use-case';
 import { AllBlocksForTaskUseCase } from './use-cases/all-blocks-for-task.use-case';
 import { BlockPositionService } from './services/block-position.service';
+import { AttachImageBlockUseCase } from './use-cases/attach-image-block.use-case';
 
 @Module({
   providers: [
@@ -39,6 +40,10 @@ import { BlockPositionService } from './services/block-position.service';
       provide: BlockTokens.BlockPositionService,
       useClass: BlockPositionService,
     },
+    {
+      provide: BlockTokens.AttachImageBlockUseCase,
+      useClass: AttachImageBlockUseCase,
+    },
   ],
   controllers: [BlockController],
   exports: [
@@ -48,6 +53,7 @@ import { BlockPositionService } from './services/block-position.service';
     BlockTokens.UpdateBlockUseCase,
     BlockTokens.MoveBlockUseCase,
     BlockTokens.AllBlocksForTaskUseCase,
+    BlockTokens.AttachImageBlockUseCase,
   ],
 })
 export class BlockModule {}

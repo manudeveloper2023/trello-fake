@@ -1,5 +1,4 @@
-import { Inject } from '@nestjs/common';
-import { FileUploadDTO } from 'src/shared/storage/dtos/file-upload.dto';
+import { BadRequestException, Inject } from '@nestjs/common';
 import type { StorageServiceInterface } from 'src/shared/storage/storage.interface';
 import { StorageTokens } from 'src/shared/storage/storage.tokens';
 import { BlockTokens } from '../block.tokens';
@@ -10,6 +9,8 @@ import { BlockPositionService } from '../services/block-position.service';
 import { AttachBlockDTO } from '../dtos/attach-block.dto';
 import { ReadBlockDTO } from '../dtos/read-block.dto';
 import { BlockMapper } from '../mappers/block.mapper';
+import { STORAGE_FOLDER } from 'src/shared/storage/storage.constants';
+import { StorageUploadException } from 'src/shared/storage/exceptions/storage-upload.exception';
 
 export type ImageUrl = string;
 
@@ -36,16 +37,6 @@ export class AttachImageBlockUseCase implements AttachImageBlockUseCaseInterface
     body: AttachBlockDTO,
     file: Express.Multer.File,
   ): Promise<ReadBlockDTO> {
-    const imageUrl = await this.storageService.uploadFile(
-      file,
-      `tasks/${taskId}/blocks`,
-    );
-
-    const createBlock: CreateBlockDTO = {
-      type: BlockType.IMAGE,
-      content: imageUrl,
-    };
-
     const { beforeBlockId, afterBlockId } = body;
     const newPosition = await this.blockPositionService.calculateCreatePosition(
       taskId,
@@ -55,14 +46,32 @@ export class AttachImageBlockUseCase implements AttachImageBlockUseCaseInterface
       },
     );
 
-    const block = await this.blockRepository.createBlock(
-      taskId,
-      createBlock,
-      newPosition,
-    );
+    if (!newPosition) {
+      throw new BadRequestException('Invalid position for new block');
+    }
 
-    const readBlockDTO: ReadBlockDTO = BlockMapper.toDTO(block);
+    try {
+      const imageUrl = await this.storageService.uploadFile(
+        file,
+        `${STORAGE_FOLDER}/tasks/${taskId}/blocks`,
+      );
 
-    return readBlockDTO;
+      const createBlock: CreateBlockDTO = {
+        type: BlockType.IMAGE,
+        content: imageUrl,
+      };
+
+      const block = await this.blockRepository.createBlock(
+        taskId,
+        createBlock,
+        newPosition,
+      );
+
+      const readBlockDTO: ReadBlockDTO = BlockMapper.toDTO(block);
+
+      return readBlockDTO;
+    } catch (error) {
+      throw new StorageUploadException('Failed to upload image file', error);
+    }
   }
 }
