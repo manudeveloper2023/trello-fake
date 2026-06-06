@@ -1,11 +1,10 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { BlockTokens } from '../block.tokens';
 import { CreateBlockDTO } from '../dtos/create-block.dto';
 import type { BlockRepositoryInterface } from '../repositories/block.repository';
 import { ReadBlockDTO } from '../dtos/read-block.dto';
 import { BlockPositionService } from '../services/block-position.service';
 import { BlockMapper } from '../mappers/block.mapper';
-import { Decimal } from 'src/generated/prisma/internal/prismaNamespace';
 export interface CreateBlockUseCaseInterface {
   execute(taskId: number, body: CreateBlockDTO): Promise<ReadBlockDTO>;
 }
@@ -28,6 +27,10 @@ export class CreateBlockUseCase implements CreateBlockUseCaseInterface {
         afterBlockId,
       },
     );
+
+    if (!newPosition) {
+      throw new BadRequestException('Invalid position for new block');
+    }
 
     const block = await this.blockRepository.createBlock(
       taskId,

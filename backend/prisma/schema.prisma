@@ -171,6 +171,7 @@ model Block {
 
   type BlockType @default(TEXT)
 
+  @@unique([taskId, position])
   @@map("blocks")
 }
 

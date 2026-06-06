@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { StorageServiceInterface } from '../storage.interface';
 import { S3_CLIENT } from '../configs/s3.config';
 import {
@@ -7,10 +7,12 @@ import {
   DeleteObjectCommand,
 } from '@aws-sdk/client-s3';
 import { ConfigService } from '@nestjs/config';
+import { StorageUploadException } from '../exceptions/storage-upload.exception';
 
 @Injectable()
 export class S3StorageService implements StorageServiceInterface {
   private readonly bucketName: string;
+  private readonly logger = new Logger(S3StorageService.name);
   constructor(
     @Inject(S3_CLIENT)
     private readonly s3: S3Client,
@@ -30,8 +32,18 @@ export class S3StorageService implements StorageServiceInterface {
       Body: file.buffer,
       ContentType: file.mimetype,
     });
-    await this.s3.send(command);
-    return `https://${this.bucketName}.s3.amazonaws.com/${key}`;
+
+    try {
+      await this.s3.send(command);
+      return `https://${this.bucketName}.s3.amazonaws.com/${key}`;
+    } catch (error) {
+      this.logger.error(
+        `Failed to upload file ${file.originalname}`,
+        error instanceof Error ? error.stack : undefined,
+      );
+
+      throw new StorageUploadException('Failed to upload file', error);
+    }
   }
 
   async deleteFile(fileKey: string): Promise<void> {

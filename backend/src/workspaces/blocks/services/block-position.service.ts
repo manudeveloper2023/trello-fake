@@ -96,6 +96,7 @@ export class BlockPositionService {
 
     if (beforeBlock && afterBlock) {
       BlockPositionValidator.ensureSameTask(beforeBlock, afterBlock);
+      BlockPositionValidator.ensureOrderedPositions(beforeBlock, afterBlock);
       return BlockPositionEngine.between(
         beforeBlock.position,
         afterBlock.position,
