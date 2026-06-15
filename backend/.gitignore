@@ -3,14 +3,9 @@
 /node_modules
 /build
 
-
-
 # prisma
 
-/prisma/migrations
-
 /src/generated
-
 
 # Logs
 logs

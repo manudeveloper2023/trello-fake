@@ -13,15 +13,6 @@ async function main() {
   const passwordHash = await bcrypt.hash('12345678', 10);
 
   await prisma.$transaction(async (tx) => {
-    await tx.task.deleteMany();
-    await tx.column.deleteMany();
-    await tx.board.deleteMany();
-    await tx.workspaceMember.deleteMany();
-    await tx.workspace.deleteMany();
-    await tx.workspaceTag.deleteMany();
-    await tx.workspaceRole.deleteMany();
-    await tx.user.deleteMany();
-
     const [ana, bruno, carla] = await Promise.all([
       tx.user.create({
         data: {
