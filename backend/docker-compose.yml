@@ -9,6 +9,13 @@ services:
       - '5433:5432'
     volumes:
       - pgdata:/var/lib/postgresql
-
+  backend:
+    build: .
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env
+    depends_on:
+      - db-pg
 volumes:
   pgdata:
