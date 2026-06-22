@@ -17,7 +17,8 @@ export const AppLayout = () => {
         <Button
           variant="outline"
           size="icon"
-          onClick={toggleTheme}
+          onClick={toggleTheme} 
+          className="cursor-pointer hover:scale-105"
           aria-label={
             theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
           }
